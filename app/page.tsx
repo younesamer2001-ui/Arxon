@@ -58,7 +58,7 @@ export default function Home() {
           <motion.div
             initial={{ y: 80 }} animate={{ y: 0 }} exit={{ y: 80 }}
             className="fixed bottom-0 left-0 right-0 z-50 p-3 md:hidden"
-            style={{ background: `rgba(8,12,20,0.9)`, borderTop: `1px solid rgba(${goldRgb},0.15)`, backdropFilter: 'blur(12px)' }}>
+            style={{ background: `rgba(5,5,16,0.92)`, borderTop: `1px solid rgba(${goldRgb},0.15)`, backdropFilter: 'blur(12px)' }}>
             <a href="#trust-bar" className="gold-btn w-full rounded-lg py-3 text-[14px] font-bold text-center block">Start kartlegging</a>
           </motion.div>
         )}
@@ -111,73 +111,89 @@ export default function Home() {
           50% { transform: translate(-60px, -40px) scale(1.2); }
         }
 
-        /* ── Hero section ── */
-        .hero-gradient-mesh {
+        /* ── Hero section (new) ── */
+        .hero-grid-overlay {
+          position: absolute;
+          inset: 0;
+          background-image:
+            linear-gradient(rgba(244,241,235,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(244,241,235,0.03) 1px, transparent 1px);
+          background-size: 60px 60px;
+          z-index: 0;
+          mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 70%);
+          -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 70%);
+        }
+
+        .hero-glow-top {
           position: absolute;
           width: 800px;
-          height: 800px;
-          background: radial-gradient(circle at 30% 30%, rgba(239, 192, 123, 0.1), transparent 70%);
-          filter: blur(60px);
-          animation: gradient-mesh 8s ease-in-out infinite;
-          top: -20%;
-          left: -10%;
+          height: 600px;
+          background: radial-gradient(ellipse at 30% 20%, rgba(239,192,123,0.08), transparent 70%);
+          filter: blur(80px);
+          top: -15%;
+          left: -5%;
           z-index: 0;
         }
 
-        .hero-orb {
+        .hero-glow-bottom {
           position: absolute;
           width: 600px;
           height: 600px;
-          background: radial-gradient(circle, rgba(239, 192, 123, 0.08), transparent);
+          background: radial-gradient(circle at 70% 80%, rgba(168,85,247,0.04), transparent 70%);
           filter: blur(80px);
-          animation: orb 15s ease-in-out infinite;
           bottom: -10%;
-          right: 10%;
+          right: -5%;
           z-index: 0;
         }
 
-        .hero-orb-accent {
-          position: absolute;
-          width: 400px;
-          height: 400px;
-          background: radial-gradient(circle, rgba(74, 222, 128, 0.05), transparent);
-          filter: blur(60px);
-          animation: orb-accent 20s ease-in-out infinite;
-          z-index: 0;
-        }
-
-        .hero-orb-accent-1 {
-          top: 20%;
-          left: 5%;
-        }
-
-        .hero-orb-accent-2 {
-          bottom: 0;
-          right: 20%;
-        }
-
-        .hero-particles {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-        }
-
-        .hero-particle {
-          position: absolute;
-          width: 2px;
-          height: 2px;
-          background: rgba(239, 192, 123, 0.3);
+        .hero-live-dot {
+          width: 6px;
+          height: 6px;
+          background: #ef4444;
           border-radius: 50%;
-          --tx: 0;
-          --ty: 0;
+          animation: hero-pulse-dot 1.5s ease-in-out infinite;
+          box-shadow: 0 0 8px rgba(239,68,68,0.4);
         }
 
-        .hero-particle-1 { top: 20%; left: 10%; --tx: 100px; --ty: -150px; animation: float-particle 8s ease-in-out infinite; }
-        .hero-particle-2 { top: 30%; right: 15%; --tx: -80px; --ty: -120px; animation: float-particle 10s ease-in-out infinite 1s; }
-        .hero-particle-3 { top: 60%; left: 5%; --tx: 120px; --ty: 100px; animation: float-particle 9s ease-in-out infinite 2s; }
-        .hero-particle-4 { top: 70%; right: 10%; --tx: -100px; --ty: 80px; animation: float-particle 11s ease-in-out infinite 1.5s; }
-        .hero-particle-5 { top: 40%; left: 50%; --tx: 0; --ty: -140px; animation: float-particle 7s ease-in-out infinite 2.5s; }
-        .hero-particle-6 { bottom: 10%; right: 40%; --tx: 90px; --ty: 110px; animation: float-particle 12s ease-in-out infinite 0.5s; }
+        @keyframes hero-pulse-dot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .hero-cursor {
+          display: inline-block;
+          animation: hero-blink 0.8s step-end infinite;
+          font-weight: 300;
+          margin-left: 2px;
+        }
+
+        @keyframes hero-blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+
+        .hero-demo-card {
+          background: rgba(10,10,25,0.6);
+          border: 1px solid rgba(244,241,235,0.08);
+          border-radius: 16px;
+          backdrop-filter: blur(20px);
+          overflow: hidden;
+          box-shadow: 0 24px 80px rgba(0,0,0,0.4), 0 0 1px rgba(239,192,123,0.1);
+        }
+
+        .hero-typing-dot {
+          width: 5px;
+          height: 5px;
+          background: rgba(239,192,123,0.4);
+          border-radius: 50%;
+          display: inline-block;
+          animation: hero-typing 1s ease-in-out infinite;
+        }
+
+        @keyframes hero-typing {
+          0%, 100% { opacity: 0.3; transform: scale(0.8); }
+          50% { opacity: 1; transform: scale(1.1); }
+        }
 
         /* ── Typography ── */
         .text-gradient-gold {
@@ -248,7 +264,7 @@ export default function Home() {
         /* ── Buttons ── */
         .gold-btn {
           background: linear-gradient(135deg, #efc07b 0%, #ffd699 100%);
-          color: #0f1b27;
+          color: #050510;
           border: none;
           cursor: pointer;
           font-weight: bold;
@@ -528,9 +544,6 @@ export default function Home() {
 
         /* ── Accessibility ── */
         @media (prefers-reduced-motion: reduce) {
-          .hero-gradient-mesh { animation: none !important; }
-          .hero-orb { animation: none !important; }
-          .hero-orb-accent { animation: none !important; }
           .gold-btn::after { transition: none; }
           .gold-btn:hover { transform: none; }
           .gold-btn-pulse { animation: none !important; }
@@ -539,10 +552,12 @@ export default function Home() {
           .hover-lift:hover { transform: none; }
           .anim-spin-slow { animation: none !important; }
           .anim-gradient-shift { animation: none !important; }
-          .hero-particle { animation: none !important; opacity: 0 !important; }
           .industry-pill:hover { transform: none; }
           .demo-dot { animation: none !important; }
           .demo-workflow-live { animation: none !important; }
+          .hero-live-dot { animation: none !important; }
+          .hero-cursor { animation: none !important; }
+          .hero-typing-dot { animation: none !important; }
         }
       `}</style>
     </>

@@ -2,7 +2,7 @@ export const gold = '#efc07b'
 export const goldLight = '#f5d49a'
 export const goldDark = '#c9a96e'
 export const goldRgb = '239,192,123'
-export const bg = '#0f1b27'
+export const bg = '#050510'
 
 export const tierColors = {
   starter: '#6ee7b7',

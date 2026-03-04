@@ -10,7 +10,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#0f1b27',
+  themeColor: '#050510',
 }
 
 export const metadata: Metadata = {
@@ -190,7 +190,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       </head>
-      <body className="min-h-screen antialiased" style={{ backgroundColor: '#0f1b27', color: '#f4f1eb' }}>
+      <body className="min-h-screen antialiased" style={{ backgroundColor: '#050510', color: '#f4f1eb' }}>
         <a href="#main-content" className="skip-to-content">Hopp til hovedinnhold</a>
         <LanguageProvider>
           <main id="main-content">
