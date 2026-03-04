@@ -4,8 +4,9 @@ import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
-import { gold } from '@/lib/constants'
+import { gold, goldRgb } from '@/lib/constants'
 import { useLanguage } from '@/lib/language-context'
+import { useCalBooking } from '@/lib/useCalBooking'
 
 declare global {
   interface Window {
@@ -31,10 +32,17 @@ export function FinalCTASection() {
   const { lang } = useLanguage()
   const no = lang === 'no'
 
+  const openBooking = useCalBooking()
+
   const ctaClick = useCallback(() => {
     trackEvent('CTA_Click', { button_text: 'Start gratis kartlegging', section: 'final_cta' })
     router.push('/kartlegging')
   }, [router])
+
+  const bookingClick = useCallback(() => {
+    trackEvent('CTA_Click', { button_text: 'Book gratis møte', section: 'final_cta' })
+    openBooking()
+  }, [openBooking])
 
   return (
     <section className="py-24 md:py-32 relative overflow-hidden" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
@@ -54,9 +62,25 @@ export function FinalCTASection() {
           <p className="text-[15px] mb-8 max-w-md mx-auto" style={{ color: 'rgba(244,241,235,0.6)' }}>
             {no ? 'Gratis kartlegging. Ingen binding. Implementert på ca. 14 dager.' : 'Free assessment. No commitment. Implemented in ~14 days.'}
           </p>
-          <button onClick={ctaClick} className="gold-btn gold-btn-pulse rounded-xl py-4 px-12 text-[16px] font-bold inline-flex items-center gap-2 group">
-            {no ? 'Start gratis kartlegging' : 'Start free assessment'} <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
-          </button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
+            <button onClick={ctaClick} className="gold-btn gold-btn-pulse rounded-xl py-4 px-12 text-[16px] font-bold inline-flex items-center gap-2 group">
+              {no ? 'Start gratis kartlegging' : 'Start free assessment'} <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
+            </button>
+            <button
+              onClick={bookingClick}
+              className="rounded-xl py-4 px-10 text-[16px] font-bold inline-flex items-center gap-2 group transition-all duration-300 hover:scale-[1.02]"
+              style={{
+                background: 'transparent',
+                border: `1px solid rgba(${goldRgb},0.4)`,
+                color: gold,
+              }}
+              data-cal-namespace="gratis-ai-konsultasjon"
+              data-cal-link="arxon/gratis-ai-konsultasjon"
+              data-cal-config='{"layout":"month_view"}'
+            >
+              {no ? 'Book gratis møte' : 'Book free meeting'}
+            </button>
+          </div>
           <p className="text-[12px] mt-4" style={{ color: 'rgba(244,241,235,0.7)' }}>
             {no ? 'Eller ring oss:' : 'Or call us:'} <a href="tel:+4778896386" className="no-underline" style={{ color: gold }}
               onClick={() => trackEvent('Phone_Click', { section: 'final_cta' })}>78 89 63 86</a>

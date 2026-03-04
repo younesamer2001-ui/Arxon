@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { gold, goldRgb } from '@/lib/constants'
 import { useLanguage } from '@/lib/language-context'
+import { useCalBooking } from '@/lib/useCalBooking'
 
 declare global {
   interface Window {
@@ -34,10 +35,17 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
   const { lang } = useLanguage()
   const no = lang === 'no'
 
+  const openBooking = useCalBooking()
+
   const ctaClick = useCallback(() => {
     trackEvent('CTA_Click', { button_text: 'Start gratis kartlegging', section: 'page' })
     router.push('/kartlegging')
   }, [router])
+
+  const bookingClick = useCallback(() => {
+    trackEvent('CTA_Click', { button_text: 'Book gratis møte', section: 'hero' })
+    openBooking()
+  }, [openBooking])
 
   return (
     <section ref={heroRef} className="pt-8 md:pt-20 pb-16 md:pb-28 text-center relative overflow-hidden min-h-[85vh] flex flex-col justify-center">
@@ -89,10 +97,27 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <button onClick={ctaClick} className="gold-btn gold-btn-pulse rounded-xl py-4 px-10 text-[16px] font-bold inline-flex items-center gap-2 group"
-            aria-label="Prøv kartlegging gratis — ingen binding">
-            {no ? 'Prøv kartlegging gratis' : 'Try assessment free'} <ArrowRight size={18} aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1" />
-          </button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button onClick={ctaClick} className="gold-btn gold-btn-pulse rounded-xl py-4 px-10 text-[16px] font-bold inline-flex items-center gap-2 group"
+              aria-label="Prøv kartlegging gratis — ingen binding">
+              {no ? 'Prøv kartlegging gratis' : 'Try assessment free'} <ArrowRight size={18} aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1" />
+            </button>
+            <button
+              onClick={bookingClick}
+              className="rounded-xl py-4 px-10 text-[16px] font-bold inline-flex items-center gap-2 group transition-all duration-300 hover:scale-[1.02]"
+              style={{
+                background: 'transparent',
+                border: `1px solid rgba(${goldRgb},0.4)`,
+                color: gold,
+              }}
+              aria-label="Book gratis AI-konsultasjon"
+              data-cal-namespace="gratis-ai-konsultasjon"
+              data-cal-link="arxon/gratis-ai-konsultasjon"
+              data-cal-config='{"layout":"month_view"}'
+            >
+              {no ? 'Book gratis møte' : 'Book free meeting'}
+            </button>
+          </div>
           <p className="text-[12px] mt-4" style={{ color: 'rgba(244,241,235,0.55)' }}>
             {no ? 'Gratis · Uforpliktende · Resultat på 2–3 min' : 'Free · No obligation · Results in 2–3 min'}
           </p>
