@@ -33,7 +33,7 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
   const openBooking = useCalBooking()
 
   const ctaClick = useCallback(() => {
-    trackEvent('CTA_Click', { button_text: 'Finn dine 15 timer', section: 'hero' })
+    trackEvent('CTA_Click', { button_text: 'Finn dine 20 timer', section: 'hero' })
     router.push('/kartlegging')
   }, [router])
 
@@ -70,7 +70,7 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
               backgroundClip: 'text',
             }}
           >
-            {no ? '15 timer' : '15 hours'}
+            {no ? '20 timer' : '20 hours'}
           </span>
         </motion.div>
 
@@ -110,9 +110,9 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
           <button
             onClick={ctaClick}
             className="gold-btn gold-btn-pulse rounded-xl py-4 px-10 text-[16px] font-bold inline-flex items-center gap-2 group"
-            aria-label={no ? 'Finn dine 15 timer' : 'Find your 15 hours'}
+            aria-label={no ? 'Finn dine 20 timer' : 'Find your 20 hours'}
           >
-            {no ? 'Finn dine 15 timer — gratis' : 'Find your 15 hours — free'}
+            {no ? 'Finn dine 20 timer — gratis' : 'Find your 20 hours — free'}
             <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
           </button>
           <button
