@@ -96,8 +96,8 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
           style={{ color: 'rgba(244,241,235,0.5)' }}
         >
           {no
-            ? 'Telefon, booking, oppfølging, admin, markedsføring — Arxon automatiserer det som bremser bedriften din. 200+ ferdige løsninger. Klar på 14 dager.'
-            : 'Phone, booking, follow-up, admin, marketing — Arxon automates what slows your business down. 200+ ready-made solutions. Ready in 14 days.'}
+            ? 'Telefon, booking, oppfølging, admin, markedsføring — Arxon automatiserer det som bremser bedriften din. 75+ ferdige løsninger. Klar på 14 dager.'
+            : 'Phone, booking, follow-up, admin, marketing — Arxon automates what slows your business down. 75+ ready-made solutions. Ready in 14 days.'}
         </motion.p>
 
         {/* ── CTAs — curiosity-driven ── */}
@@ -143,7 +143,7 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
           <span style={{ color: 'rgba(244,241,235,0.12)' }}>·</span>
           <span>{no ? 'Ingen binding' : 'No commitment'}</span>
           <span style={{ color: 'rgba(244,241,235,0.12)' }}>·</span>
-          <span>{no ? '200+ automatiseringer' : '200+ automations'}</span>
+          <span>{no ? '75+ automatiseringer' : '75+ automations'}</span>
         </motion.div>
       </motion.div>
     </section>

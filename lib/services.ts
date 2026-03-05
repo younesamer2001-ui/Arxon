@@ -36,20 +36,6 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "2-5d"
       },
       {
-        "name": "AI-telefonsvarer førstekontakt",
-        "desc": "Samler saksinfo, booker konsultasjon",
-        "benefit": "Kvalifiserer klienter 24/7",
-        "complexity": "Middels",
-        "implTime": "2-5d"
-      },
-      {
-        "name": "AI-telefonsvar bestilling/reservasjon",
-        "desc": "Bordbestilling og takeaway via telefon",
-        "benefit": "AI svarer alltid, også i rushet",
-        "complexity": "Middels",
-        "implTime": "2-5d"
-      },
-      {
         "name": "AI-telefonsvarer visning/info",
         "desc": "Svarer spørsmål, booker visning, samler kjøperinfo",
         "benefit": "Kvalifiserer interessenter 24/7",
@@ -64,53 +50,11 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "1-2d"
       },
       {
-        "name": "AI-telefonsvarer timebestilling",
-        "desc": "Svarer pasienter, sjekker tid, booker time",
-        "benefit": "Avlaster resepsjonen 50-70%",
-        "complexity": "Middels",
-        "implTime": "2-5d"
-      },
-      {
-        "name": "Henvisning-tracking",
-        "desc": "Logger henvisning → følger opp status",
-        "benefit": "Ingen faller mellom stolene",
-        "complexity": "Middels",
-        "implTime": "1d"
-      },
-      {
-        "name": "KPI-rapport til Slack/e-post",
-        "desc": "Nøkkeltall (bookinger, pasienter) → rapport",
-        "benefit": "Ledelsen har oversikt",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "SoMe auto-post nye produkter",
-        "desc": "Nytt produkt → AI-post → Instagram/Facebook",
-        "benefit": "Markedsføring på autopilot",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "AI-telefonsvarer kundestøtte",
-        "desc": "Svarer rutinespørsmål, booker møte for komplekse",
-        "benefit": "Frigjør regnskapsførers tid",
-        "complexity": "Middels",
-        "implTime": "2-5d"
-      },
-      {
         "name": "Timeregistrering → faktura",
         "desc": "Timer → auto faktura ved månedsslutt",
         "benefit": "Null glemte timer",
         "complexity": "Middels",
         "implTime": "1-2d"
-      },
-      {
-        "name": "Intervjubooking",
-        "desc": "Kandidat velger tid → begge får bekreftelse",
-        "benefit": "Slipper 5 e-poster",
-        "complexity": "Lav",
-        "implTime": "2-4t"
       },
       {
         "name": "AI-telefonsvarer verksted",
@@ -134,34 +78,6 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "2-5d"
       },
       {
-        "name": "Prosjektforespørsel-intake",
-        "desc": "Brief → AI strukturerer + estimerer scope",
-        "benefit": "Slipper 3 møter",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "AI-telefonsvar for påmelding",
-        "desc": "Svarer kurs-spørsmål, melder på, booker prøve",
-        "benefit": "Null tapt påmelding",
-        "complexity": "Middels",
-        "implTime": "2-5d"
-      },
-      {
-        "name": "KPI-dashboard oppdatering",
-        "desc": "Daglig: MRR, brukere, tickets, uptime",
-        "benefit": "Nøkkeltall uten å grave",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "AI-booking treningsøkter",
-        "desc": "Ringer/melder på → AI booker økt",
-        "benefit": "Fyller timer uten resepsjon",
-        "complexity": "Middels",
-        "implTime": "2-5d"
-      },
-      {
         "name": "AI-telefonsvarer reservasjoner",
         "desc": "Svarer 24/7, sjekker tilgjengelighet, booker",
         "benefit": "Fanger gjester utenfor åpningstid",
@@ -174,20 +90,6 @@ export const serviceCategories: ServiceCategory[] = [
         "benefit": "Skalerbar drift",
         "complexity": "Middels",
         "implTime": "1-2d"
-      },
-      {
-        "name": "AI show-notes generering",
-        "desc": "Transkriberer → AI show notes + timestamps",
-        "benefit": "Sparer 1-2 timer per episode",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Gjeste-booking workflow",
-        "desc": "Invitasjon → booking → briefing-info",
-        "benefit": "Profesjonell gjeste-håndtering",
-        "complexity": "Middels",
-        "implTime": "0.5-1d"
       }
     ]
   },
@@ -226,32 +128,11 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "1-2d"
       },
       {
-        "name": "Auto kandidat-oppfølging",
-        "desc": "Statusoppdatering til alle i pipeline",
-        "benefit": "Ingen radio silence",
-        "complexity": "Middels",
-        "implTime": "0.5-1d"
-      },
-      {
-        "name": "Lead magnet-levering",
-        "desc": "Gratis guide → e-postsekvens → coaching-tilbud",
-        "benefit": "Konverterer leads",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
         "name": "KPI-rapport",
         "desc": "Nøkkeltall (leads, portefølje) i rapport",
         "benefit": "Oversikt for ledelsen",
         "complexity": "Lav",
         "implTime": "2-4t"
-      },
-      {
-        "name": "Trial → betalende konvertering",
-        "desc": "Prøveperiode → onboarding → tilbud",
-        "benefit": "Øker konverteringsrate",
-        "complexity": "Middels",
-        "implTime": "1-2d"
       }
     ]
   },
@@ -311,20 +192,6 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "2-6t"
       },
       {
-        "name": "Frist- og frempåminnelser",
-        "desc": "Varsling X dager før frister",
-        "benefit": "Null glemte frister",
-        "complexity": "Middels",
-        "implTime": "0.5-1d"
-      },
-      {
-        "name": "Timeregistrering-påminnelse",
-        "desc": "Daglig påminnelse + auto-oppsummering",
-        "benefit": "Øker fakturerbar tid 10-20%",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
         "name": "Kundeundersøkelse etter besøk",
         "desc": "SMS-survey 2t etter besøk",
         "benefit": "Fanger misnøye tidlig",
@@ -353,58 +220,9 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "1-2d"
       },
       {
-        "name": "Timepåminnelse med forberedelse",
-        "desc": "SMS 48t/2t før med instruksjoner",
-        "benefit": "Reduserer no-shows + forberedte pasienter",
-        "complexity": "Lav",
-        "implTime": "2-6t"
-      },
-      {
         "name": "Venteliste-håndtering",
         "desc": "Avbestilling → neste på liste varsles",
         "benefit": "Null inntektstap",
-        "complexity": "Middels",
-        "implTime": "0.5-1d"
-      },
-      {
-        "name": "Oppfølging etter behandling",
-        "desc": "Tilpasset melding 1, 7, 30 dager etter",
-        "benefit": "Fanger komplikasjoner tidlig",
-        "complexity": "Middels",
-        "implTime": "0.5-1d"
-      },
-      {
-        "name": "Resept-påminnelse",
-        "desc": "Varsel når resept snart utløper",
-        "benefit": "Bedre behandlingsresultat",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Forlatt handlekurv-oppfølging",
-        "desc": "Ikke kjøpt → AI-mail 1t, 24t, 72t etter",
-        "benefit": "Henter tilbake 10-15%",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Produktanmeldelse-forespørsel",
-        "desc": "7d etter levering → anmeldelses-mail",
-        "benefit": "3-5x flere anmeldelser",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Momsfrister-varsling",
-        "desc": "Auto-påminnelse til kunder før frist",
-        "benefit": "Null glemte frister",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Dokumentforespørsel-workflow",
-        "desc": "Mangler bilag → auto-forespørsel → purring",
-        "benefit": "Systemet maser, ikke du",
         "complexity": "Middels",
         "implTime": "0.5-1d"
       },
@@ -444,79 +262,9 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "2-4t"
       },
       {
-        "name": "Oppfølging mellom sesjoner",
-        "desc": "AI sender refleksjonsspørsmål → samler svar",
-        "benefit": "Dypere coaching",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Testimonialer-innsamling",
-        "desc": "Etter X sesjoner → auto forespørsel",
-        "benefit": "Sosialt bevis automatisk",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Webinar-registrering + oppfølging",
-        "desc": "Registrering → påminnelse → opptak → tilbud",
-        "benefit": "Komplett webinar-funnel",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Fillevering + feedback",
-        "desc": "Leverer filer → klient gir feedback i skjema",
-        "benefit": "Strukturert feedback",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
         "name": "Betaling-påminnelse",
         "desc": "Auto påminnelse + purring ved ubetalt",
         "benefit": "Sikrer inntekt",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Onboarding ny SaaS-kunde",
-        "desc": "Betaling → velkomst → veiledning → oppfølging",
-        "benefit": "Reduserer churn",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Churn-prediksjon",
-        "desc": "Bruksmønster → frafall-tegn → auto outreach",
-        "benefit": "Redd kunder før oppsigelse",
-        "complexity": "Høy",
-        "implTime": "3-5d"
-      },
-      {
-        "name": "Lisensfornyelse-varsling",
-        "desc": "X dager før → påminnelse + fornyelseslenke",
-        "benefit": "Reduserer churn",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Medlemspåminnelse",
-        "desc": "SMS 2t før klasse med info",
-        "benefit": "Reduserer no-shows",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Medlemsfornyelse",
-        "desc": "30d før utløp → tilbud om fornyelse",
-        "benefit": "Automatisk retention",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Prøvetime-oppfølging",
-        "desc": "Etter gratis prøve → auto tilbud",
-        "benefit": "Konverterer til medlemskap",
         "complexity": "Lav",
         "implTime": "2-4t"
       },
@@ -563,13 +311,6 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "2-6t"
       },
       {
-        "name": "Medlemsfornyelse-påminnelse",
-        "desc": "Xd før utløp → påminnelse + lenke",
-        "benefit": "Reduserer frafall",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
         "name": "Churn-forebygging",
         "desc": "Bruksmønster → inaktivitet → auto outreach",
         "benefit": "Redd kunder før churn",
@@ -605,13 +346,6 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "2-4t"
       },
       {
-        "name": "Helseattest-påminnelse",
-        "desc": "Auto påminnelse om årlig kontroll",
-        "benefit": "Bedre forebygging",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
         "name": "Klage-håndtering workflow",
         "desc": "Klage → kategoriseres → eskaleres → oppfølging",
         "benefit": "Kortere behandlingstid",
@@ -634,58 +368,9 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "1-2d"
       },
       {
-        "name": "Klientoppdatering via e-post",
-        "desc": "Ukentlig statusmail til klient",
-        "benefit": "Automatiserer klientkommunikasjon",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
         "name": "Dokumentarkiv + oppgave",
         "desc": "E-post-dokumenter → standardisert arkiv + oppgave",
         "benefit": "Bedre sporbarhet",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Meny-oppdatering på nett",
-        "desc": "Oppdater ett sted → pusher til nett + SoMe",
-        "benefit": "Slipper 5 manuelle oppdateringer",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "SoMe matbilder auto-post",
-        "desc": "Bilde → AI caption + hashtags → auto-post",
-        "benefit": "SoMe alltid aktiv",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "AI produktbeskrivelser",
-        "desc": "Stikkord → AI-optimalisert produkttekst + SEO",
-        "benefit": "Sparer timer på copywriting",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Kundesegmentering",
-        "desc": "Auto: førstegangskjøper, lojal, inaktiv → kampanjer",
-        "benefit": "Riktig melding til riktig kunde",
-        "complexity": "Høy",
-        "implTime": "2-3d"
-      },
-      {
-        "name": "Referansesjekk-workflow",
-        "desc": "Auto e-post med spørsmålsskjema → svar samles",
-        "benefit": "Systematisk uten manuelt arbeid",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Automatisk kurslevering",
-        "desc": "Kjøper kurs → moduler leveres via e-post",
-        "benefit": "Kurs selger 24/7",
         "complexity": "Middels",
         "implTime": "1-2d"
       },
@@ -704,13 +389,6 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "1-2d"
       },
       {
-        "name": "Instagram treningsinnhold",
-        "desc": "AI-tips og motivasjon → auto-post",
-        "benefit": "Synlighet uten tidsinvestering",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
         "name": "Sesongkampanjer",
         "desc": "AI-kampanjer basert på sesong og belegg",
         "benefit": "Fyller lavsesong",
@@ -723,83 +401,6 @@ export const serviceCategories: ServiceCategory[] = [
         "benefit": "Retention uten oppfølging",
         "complexity": "Lav",
         "implTime": "2-4t"
-      },
-      {
-        "name": "AI-innholdsproduksjon",
-        "desc": "AI genererer blogg, SoMe, nyhetsbrev",
-        "benefit": "70% raskere produksjon",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "SEO-rangeringsovervåkning",
-        "desc": "Daglig sjekk → varsler ved endringer",
-        "benefit": "Proaktiv SEO",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Kampanjerapport-generering",
-        "desc": "Data fra annonser → AI-rapport til klient",
-        "benefit": "Sparer timer per klient",
-        "complexity": "Høy",
-        "implTime": "2-3d"
-      },
-      {
-        "name": "SoMe auto-scheduling",
-        "desc": "AI-innhold → alle plattformer optimal tid",
-        "benefit": "Konsistent tilstedeværelse",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Konkurranseanalyse",
-        "desc": "Overvåker konkurrenters innhold + annonser",
-        "benefit": "Alltid oppdatert",
-        "complexity": "Høy",
-        "implTime": "3-5d"
-      },
-      {
-        "name": "Klientprosjekt-status",
-        "desc": "Ukentlig auto-rapport om kampanjeresultater",
-        "benefit": "Klient alltid informert",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "SoMe-innholdsgenerering",
-        "desc": "AI poster om organisasjonens arbeid",
-        "benefit": "Synlighet uten SoMe-ressurs",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Episode-publisering flerkanals",
-        "desc": "Ny episode → Spotify, Apple, YouTube + SoMe",
-        "benefit": "Publiser én gang, overalt",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Nyhetsbrev-automatisering",
-        "desc": "Ukentlig med siste episoder + høydepunkter",
-        "benefit": "Publikum engasjert uten arbeid",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Innholds-kalender",
-        "desc": "AI månedlig plan basert på trender",
-        "benefit": "Alltid planlagt innhold",
-        "complexity": "Middels",
-        "implTime": "1d"
-      },
-      {
-        "name": "Klipp-generering for SoMe",
-        "desc": "Lange episoder → AI beste klipp → TikTok",
-        "benefit": "Maks rekkevidde fra innhold",
-        "complexity": "Høy",
-        "implTime": "3-5d"
       }
     ]
   },
@@ -852,48 +453,6 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "2-4t"
       },
       {
-        "name": "Saksdokument-oppsummering",
-        "desc": "AI lager sammendrag med nøkkelpunkter og frister",
-        "benefit": "Sparer 30-60 min per sak",
-        "complexity": "Høy",
-        "implTime": "3-7d"
-      },
-      {
-        "name": "Avtale-/kontraktsgenerering",
-        "desc": "AI fyller standardavtaler fra klientdata",
-        "benefit": "Sparer timer på rutinekontrakter",
-        "complexity": "Høy",
-        "implTime": "2-3d"
-      },
-      {
-        "name": "Ny klient onboarding",
-        "desc": "Velkomstpakke, skjemaer, kalenderlenke",
-        "benefit": "Profesjonelt førsteinntrykk",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Daglig råvarestatus",
-        "desc": "Lagersjekk → bestillingsliste → leverandør",
-        "benefit": "Reduserer matsvinn",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Ansattplan-varsling",
-        "desc": "Vaktplan → SMS til ansatte",
-        "benefit": "Null misforståelser om vakter",
-        "complexity": "Lav",
-        "implTime": "2-6t"
-      },
-      {
-        "name": "Catering-kalkulator",
-        "desc": "Antall gjester + event → AI foreslår meny + pris",
-        "benefit": "Automatiserer tilbud",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
         "name": "Automatisk boligpresentasjon",
         "desc": "AI genererer boligbeskrivelse fra nøkkeldata",
         "benefit": "Sparer 30-60 min per bolig",
@@ -908,83 +467,6 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "2-4t"
       },
       {
-        "name": "Pasientskjema før konsultasjon",
-        "desc": "Helseskjema 48t før → klar i journal",
-        "benefit": "Sparer 10-15 min per konsultasjon",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Ny sak → oppgave i Trello/Asana",
-        "desc": "Ny henvendelse → standard oppgavesett",
-        "benefit": "Ingenting glemmes",
-        "complexity": "Lav",
-        "implTime": "2-6t"
-      },
-      {
-        "name": "Ordrebekreftelse + tracking",
-        "desc": "Ny ordre → personlig mail + tracking",
-        "benefit": "Profesjonell kundeopplevelse",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Lagerstatus-varsling",
-        "desc": "Under X enheter → varsel + 'Snart utsolgt'",
-        "benefit": "Aldri utsolgt uten å vite det",
-        "complexity": "Middels",
-        "implTime": "0.5-1d"
-      },
-      {
-        "name": "Retur-håndtering",
-        "desc": "Returforespørsel → AI vurderer → returlabel",
-        "benefit": "80% mindre manuell håndtering",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Konkurrentpris-overvåkning",
-        "desc": "Sjekker konkurrentpriser daglig → varsler",
-        "benefit": "Automatisk prisintelligens",
-        "complexity": "Høy",
-        "implTime": "3-5d"
-      },
-      {
-        "name": "Bilagshåndtering med AI",
-        "desc": "Bilde av kvittering → AI leser → regnskapssystem",
-        "benefit": "Kunden slipper samle bilag",
-        "complexity": "Høy",
-        "implTime": "3-5d"
-      },
-      {
-        "name": "AI-screening av søknader",
-        "desc": "AI scorer CV mot kravspek → rangerer",
-        "benefit": "Minutter i stedet for timer",
-        "complexity": "Høy",
-        "implTime": "3-5d"
-      },
-      {
-        "name": "LinkedIn-sourcing",
-        "desc": "Søker LinkedIn → samler → personlig outreach",
-        "benefit": "Pipeline på autopilot",
-        "complexity": "Høy",
-        "implTime": "3-5d"
-      },
-      {
-        "name": "Onboarding-checklist ny ansatt",
-        "desc": "Signert → IT-tilgang, utstyr, velkomstpakke",
-        "benefit": "Ingenting glemmes",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Stillings-publisering flerkanals",
-        "desc": "Skriv én gang → Finn, LinkedIn, etc.",
-        "benefit": "Bred distribusjon",
-        "complexity": "Høy",
-        "implTime": "3-5d"
-      },
-      {
         "name": "Reparasjonsstatus til kunde",
         "desc": "Auto SMS: diagnostikk → deler → klar",
         "benefit": "Profesjonelt, kunden slipper ringe",
@@ -997,90 +479,6 @@ export const serviceCategories: ServiceCategory[] = [
         "benefit": "Aldri tom for deler",
         "complexity": "Middels",
         "implTime": "0.5-1d"
-      },
-      {
-        "name": "Auto prosjekt-oppdatering",
-        "desc": "Ukentlig statusmail til klient",
-        "benefit": "Klient informert uten din tid",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Portfolio auto-oppdatering",
-        "desc": "Ferdig prosjekt → AI case study → nettside",
-        "benefit": "Portfolio alltid oppdatert",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "AI tilbudsgenerering",
-        "desc": "AI lager tilbud basert på scope + standardpriser",
-        "benefit": "Tilbud på minutter",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Kontrakt-sending",
-        "desc": "Godkjent → auto kontrakt → signering",
-        "benefit": "Raskere oppstart",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Kursplan-distribusjon",
-        "desc": "Ny elev → auto kursplan + materiell",
-        "benefit": "Elevene forberedt",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Fravær-varsling",
-        "desc": "Elev møter ikke → varsel til foresatte",
-        "benefit": "Oppdager frafall tidlig",
-        "complexity": "Middels",
-        "implTime": "0.5-1d"
-      },
-      {
-        "name": "Sertifikat-generering",
-        "desc": "Fullført → AI-sertifikat → sendes auto",
-        "benefit": "Profesjonelt og skalerbart",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Ticket-triagering med AI",
-        "desc": "AI kategoriserer, prioriterer, ruter til team",
-        "benefit": "Sparer L1-support timer",
-        "complexity": "Høy",
-        "implTime": "3-5d"
-      },
-      {
-        "name": "Serverovervåkning-varsling",
-        "desc": "Sjekker status hvert 5 min → varsler",
-        "benefit": "Oppdager problemer før kundene",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Release notes-generering",
-        "desc": "Ny versjon → AI oppsummerer → brukervennlig",
-        "benefit": "Profesjonell kommunikasjon",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Treningsprogram-levering",
-        "desc": "AI-tilpasset program → ukentlig oppdatering",
-        "benefit": "Skalerbar personlig trening",
-        "complexity": "Høy",
-        "implTime": "2-3d"
-      },
-      {
-        "name": "Kostholdsplan-assistanse",
-        "desc": "AI-kostholdsforslag basert på mål",
-        "benefit": "Merverdi uten ekstra tid",
-        "complexity": "Middels",
-        "implTime": "1-2d"
       },
       {
         "name": "Registrering + bekreftelse",
@@ -1104,20 +502,6 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "0.5-1d"
       },
       {
-        "name": "Sponsor-kommunikasjon",
-        "desc": "Auto status til sponsorer: tall, rekkevidde",
-        "benefit": "Sponsorer som kommer tilbake",
-        "complexity": "Middels",
-        "implTime": "0.5-1d"
-      },
-      {
-        "name": "Billettsalg-varsling",
-        "desc": "Daglig: solgt, inntekt, kapasitet",
-        "benefit": "Oversikt uten login",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
         "name": "Vedlikeholdslogg + varsling",
         "desc": "Logger behov → varsler ansatte → sporer",
         "benefit": "Bedre gjesteopplevelse",
@@ -1132,97 +516,6 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "1d"
       },
       {
-        "name": "KYC-dokumentinnhenting",
-        "desc": "Auto forespørsel om ID → verifisering → status",
-        "benefit": "Reduserer manuelt KYC-arbeid",
-        "complexity": "Høy",
-        "implTime": "3-5d"
-      },
-      {
-        "name": "Transaksjonsovervåkning",
-        "desc": "Sjekker transaksjoner → flagger mistenkelige",
-        "benefit": "Anti-hvitvasking automatisert",
-        "complexity": "Høy",
-        "implTime": "3-5d"
-      },
-      {
-        "name": "Kundeportal-varsling",
-        "desc": "Auto varsel ved statusendringer",
-        "benefit": "Kunden alltid informert",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "A/B-test resultater → Slack",
-        "desc": "Signifikans nådd → auto varsel med vinner",
-        "benefit": "Raskere beslutninger",
-        "complexity": "Middels",
-        "implTime": "1d"
-      },
-      {
-        "name": "Sendingssporing + kundevarsling",
-        "desc": "Auto SMS ved hvert steg: hentet → levert",
-        "benefit": "Færre supporthenvendelser",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Ruteoptimalisering-varsling",
-        "desc": "Daglig ruteplan → SMS til sjåfører",
-        "benefit": "Spart drivstoff og tid",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Lagerstatus-overvåkning",
-        "desc": "Lav beholdning → varsel → trigger bestilling",
-        "benefit": "Reduserer stans",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Avvikshåndtering",
-        "desc": "Forsinkelse/skade → kunde-varsel + eskalering",
-        "benefit": "Raskere respons",
-        "complexity": "Middels",
-        "implTime": "0.5-1d"
-      },
-      {
-        "name": "Sjåfør-tilgjengelighetsplan",
-        "desc": "Melder tilgjengelighet → auto vaktplan",
-        "benefit": "Null misforståelser",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Frivillig-registrering + onboarding",
-        "desc": "Ny frivillig → velkomst + oppgaver + info",
-        "benefit": "Profesjonell oppstart",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Støttebrev-generering",
-        "desc": "AI genererer søknader om tilskudd",
-        "benefit": "Sparer timer",
-        "complexity": "Høy",
-        "implTime": "2-3d"
-      },
-      {
-        "name": "Feature request-tracking",
-        "desc": "Forespørsler → AI kategoriserer → Jira",
-        "benefit": "Bygger produkt fra kundebehov",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Auto changelog/release notes",
-        "desc": "Nye releases → AI release notes",
-        "benefit": "Profesjonell uten dev-tid",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
         "name": "Vedlikeholdsforespørsel-workflow",
         "desc": "Beboer melder feil → rutes → status-oppdatering",
         "benefit": "Strukturert feilhåndtering",
@@ -1235,34 +528,6 @@ export const serviceCategories: ServiceCategory[] = [
         "benefit": "Alle informert",
         "complexity": "Lav",
         "implTime": "2-4t"
-      },
-      {
-        "name": "Årsmøte-innkalling",
-        "desc": "Auto innkalling + agenda + fullmaktsskjema",
-        "benefit": "Lovpålagte frister overholdt",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Skademelding-intake",
-        "desc": "Kunde melder skade → AI kategoriserer → ruter",
-        "benefit": "Raskere saksbehandling",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Forsikringsbevis-generering",
-        "desc": "Ny forsikring → auto bevis → sendes",
-        "benefit": "Kunden får bevis umiddelbart",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Behandlingskoordinering",
-        "desc": "Koordinerer forsikring-klinikk-pasient auto",
-        "benefit": "Raskere behandling",
-        "complexity": "Høy",
-        "implTime": "2-3d"
       }
     ]
   },
@@ -1294,109 +559,11 @@ export const serviceCategories: ServiceCategory[] = [
         "implTime": "2-3d"
       },
       {
-        "name": "Kvartalsrapport pasientstrøm",
-        "desc": "Auto: nye pasienter, tjenester, inntekt",
-        "benefit": "Data-drevet beslutning",
-        "complexity": "Middels",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Månedsrapport-generering",
-        "desc": "Nøkkeltall → AI-rapport → til kunden",
-        "benefit": "Verdifull rapport automatisk",
-        "complexity": "Høy",
-        "implTime": "2-3d"
-      },
-      {
-        "name": "Turnover-analyse",
-        "desc": "Kvartalsrapport: ansettelser, avganger, KPI-er",
-        "benefit": "Viser rekrutteringens verdi",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Klientfremgang-dashboard",
-        "desc": "Auto-oppsummering mål, progresjon, neste steg",
-        "benefit": "Øker retention",
-        "complexity": "Middels",
-        "implTime": "1d"
-      },
-      {
-        "name": "Karakterer/fremgang-rapport",
-        "desc": "Auto fremgangsrapport til elev/foresatte",
-        "benefit": "Øker tilfredshet",
-        "complexity": "Middels",
-        "implTime": "1d"
-      },
-      {
-        "name": "Evaluering etter kurs",
-        "desc": "Auto survey → AI-rapport med innsikter",
-        "benefit": "Forbedrer kurs med data",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Bug-rapport til Jira",
-        "desc": "Skjema → AI kategoriserer → issue automatisk",
-        "benefit": "Strukturerte rapporter",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Resultat-tracking",
-        "desc": "Ukentlig: 'Hvordan gikk det?' → AI-analyse",
-        "benefit": "Klient føler seg fulgt opp",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Live feedback under event",
-        "desc": "QR → spørsmål → sanntids dashboard",
-        "benefit": "Juster i sanntid",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
         "name": "Daglig beleggrapport",
         "desc": "Auto: belegg, inntekt, ankomster",
         "benefit": "Oversikt uten manuell sjekk",
         "complexity": "Lav",
         "implTime": "2-4t"
-      },
-      {
-        "name": "Ukentlig KPI-rapport transport",
-        "desc": "Auto: leveringer, forsinkelser, kostnader",
-        "benefit": "Data-drevet optimalisering",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Årlig giverrapport",
-        "desc": "Auto årsoppsummering til hver giver",
-        "benefit": "Øker gjengivelsesrate",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Sponsorkommunikasjon",
-        "desc": "Auto rapport til sponsorer: tall, rekkevidde",
-        "benefit": "Fornyet sponsorat",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Bruksanalyse → Slack-rapport",
-        "desc": "Daglig: aktive brukere, features, feil",
-        "benefit": "Team ser data uten å grave",
-        "complexity": "Middels",
-        "implTime": "1d"
-      },
-      {
-        "name": "Energi-/forbruksrapport",
-        "desc": "Forbruksdata → rapport per enhet/bygg",
-        "benefit": "Data-drevet energisparing",
-        "complexity": "Middels",
-        "implTime": "1-2d"
       }
     ]
   },
@@ -1426,27 +593,6 @@ export const serviceCategories: ServiceCategory[] = [
         "benefit": "Bedre likviditet",
         "complexity": "Middels",
         "implTime": "1-2d"
-      },
-      {
-        "name": "Donasjon-bekreftelse + takkemail",
-        "desc": "Ny donasjon → takkebrev + skatteinfo",
-        "benefit": "Donorer føler seg verdsatt",
-        "complexity": "Lav",
-        "implTime": "2-4t"
-      },
-      {
-        "name": "Felleskostnader-beregning",
-        "desc": "Auto beregning og fakturering per enhet",
-        "benefit": "Rettferdig, null manuelt",
-        "complexity": "Middels",
-        "implTime": "1-2d"
-      },
-      {
-        "name": "Portefølje-rapport",
-        "desc": "Auto: aktive forsikringer, utbetalinger, rate",
-        "benefit": "Oversikt for ledelsen",
-        "complexity": "Middels",
-        "implTime": "1-2d"
       }
     ]
   },
@@ -1457,23 +603,9 @@ export const serviceCategories: ServiceCategory[] = [
     "title": "Compliance & GDPR",
     "automations": [
       {
-        "name": "Konfliktsøk",
-        "desc": "Auto-sjekk nye klienter mot eksisterende saker",
-        "benefit": "Lovpålagt sjekk på sekunder",
-        "complexity": "Høy",
-        "implTime": "1-2d"
-      },
-      {
         "name": "GDPR samtykke- og audit-logg",
         "desc": "Loggfører samtykke/avmelding i audit-spor",
         "benefit": "Compliance-risiko redusert",
-        "complexity": "Middels",
-        "implTime": "0.5-1d"
-      },
-      {
-        "name": "Samtykke- og audit-logg",
-        "desc": "Samtykke-logging for helsekommunikasjon",
-        "benefit": "Lovpålagt for helse",
         "complexity": "Middels",
         "implTime": "0.5-1d"
       }

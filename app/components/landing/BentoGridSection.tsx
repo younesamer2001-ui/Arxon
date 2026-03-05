@@ -68,7 +68,7 @@ export function BentoGridSection() {
 
         <motion.div {...sAnim} className="text-center mt-10">
           <Link href="/tjenester" className="inline-flex items-center gap-2 text-[14px] font-medium" style={{ color: gold, textDecoration: 'none' }}>
-            {no ? 'Se alle 200+ automatiseringer' : 'See all 200+ automations'} <ArrowUpRight size={15} />
+            {no ? 'Se alle 75+ automatiseringer' : 'See all 75+ automations'} <ArrowUpRight size={15} />
           </Link>
         </motion.div>
       </div>
