@@ -42,17 +42,17 @@ export function IndustriesSection() {
 
         <motion.div className="grid grid-cols-2 md:grid-cols-5 gap-4" {...staggerContainer}>
           {(no ? [
-            { icon: Hammer, label: 'Bygg & Håndverk', count: 16, slug: 'bygg-og-handverk' },
-            { icon: HomeIcon, label: 'Eiendom', count: 15, slug: 'eiendomsmegling' },
-            { icon: Scissors, label: 'Salong & Skjønnhet', count: 14, slug: 'salong-og-skjonnhet' },
-            { icon: Car, label: 'Bilverksted', count: 14, slug: 'bilverksted-og-bilforhandler' },
-            { icon: Plane, label: 'Reiseliv', count: 15, slug: 'reiseliv-og-overnatting' },
+            { icon: Hammer, label: 'Bygg & Håndverk', count: 12, slug: 'bygg-og-handverk' },
+            { icon: HomeIcon, label: 'Eiendom', count: 12, slug: 'eiendomsmegling' },
+            { icon: Scissors, label: 'Salong & Skjønnhet', count: 10, slug: 'salong-og-skjonnhet' },
+            { icon: Car, label: 'Bilverksted', count: 9, slug: 'bilverksted-og-bilforhandler' },
+            { icon: Plane, label: 'Reiseliv', count: 10, slug: 'reiseliv-og-overnatting' },
           ] : [
-            { icon: Hammer, label: 'Construction', count: 16, slug: 'bygg-og-handverk' },
-            { icon: HomeIcon, label: 'Real Estate', count: 15, slug: 'eiendomsmegling' },
-            { icon: Scissors, label: 'Salon & Beauty', count: 14, slug: 'salong-og-skjonnhet' },
-            { icon: Car, label: 'Automotive', count: 14, slug: 'bilverksted-og-bilforhandler' },
-            { icon: Plane, label: 'Travel & Hospitality', count: 15, slug: 'reiseliv-og-overnatting' },
+            { icon: Hammer, label: 'Construction', count: 12, slug: 'bygg-og-handverk' },
+            { icon: HomeIcon, label: 'Real Estate', count: 12, slug: 'eiendomsmegling' },
+            { icon: Scissors, label: 'Salon & Beauty', count: 10, slug: 'salong-og-skjonnhet' },
+            { icon: Car, label: 'Automotive', count: 9, slug: 'bilverksted-og-bilforhandler' },
+            { icon: Plane, label: 'Travel & Hospitality', count: 10, slug: 'reiseliv-og-overnatting' },
           ]).map((ind, i) => (
             <motion.div key={ind.slug} variants={staggerChild}>
               <Link href={`/bransjer#${ind.slug}`} style={{ textDecoration: 'none' }}>

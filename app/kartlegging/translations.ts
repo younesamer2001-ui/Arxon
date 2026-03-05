@@ -28,7 +28,7 @@ export const T: Record<string, Record<string, string>> = {
   summary_title: { no: "Din AI-analyse", en: "Your AI analysis" },
   confirm_title: { no: "Takk for din henvendelse!", en: "Thank you for your inquiry!" },
   confirm_ref: { no: "Referansenummer", en: "Reference number" },
-  badge_automations: { no: "53+ automatiseringer tilgjengelig", en: "53+ automations available" },
+  badge_automations: { no: "75+ automatiseringer tilgjengelig", en: "75+ automations available" },
   trust_free: { no: "Gratis kartlegging", en: "Free assessment" },
   trust_done: { no: "Ferdig på ca. 14 dager", en: "Ready in approx. 14 days" },
   trust_support: { no: "Norsk support", en: "Norwegian support" },

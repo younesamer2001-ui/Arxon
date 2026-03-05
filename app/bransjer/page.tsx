@@ -27,7 +27,8 @@ const iconMap: Record<string, any> = {
   Megaphone, Truck, Heart, Mic, Cloud, Building2, ShieldCheck, Briefcase,
 }
 
-const totalAutomations = industries.reduce((sum, ind) => sum + ind.count, 0)
+// 75+ is the site-wide standard; per-industry .count fields reflect that industry's specific automations
+const totalAutomations = 75
 
 export default function BransjerPage() {
   const [search, setSearch] = useState('')
