@@ -33,7 +33,7 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
   const openBooking = useCalBooking()
 
   const ctaClick = useCallback(() => {
-    trackEvent('CTA_Click', { button_text: 'Se hva du taper', section: 'hero' })
+    trackEvent('CTA_Click', { button_text: 'Finn dine 15 timer', section: 'hero' })
     router.push('/kartlegging')
   }, [router])
 
@@ -54,15 +54,15 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
         className="relative z-10 w-full max-w-4xl mx-auto px-5 py-24 md:py-0 text-center"
         style={{ y: heroTextY, opacity: heroOpacity }}
       >
-        {/* ── THE NUMBER — pattern interrupt, anchoring bias ── */}
+        {/* ── THE NUMBER — anchoring, pattern interrupt ── */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
-          className="mb-4"
+          className="mb-3"
         >
           <span
-            className="text-[56px] sm:text-[72px] md:text-[96px] lg:text-[120px] font-black leading-none tracking-tighter"
+            className="text-[60px] sm:text-[80px] md:text-[110px] lg:text-[140px] font-black leading-none tracking-tighter"
             style={{
               background: `linear-gradient(135deg, ${gold}, #ffd699, ${gold})`,
               WebkitBackgroundClip: 'text',
@@ -70,59 +70,49 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
               backgroundClip: 'text',
             }}
           >
-            {no ? '23 000 kr' : '23 000 NOK'}
+            {no ? '15 timer' : '15 hours'}
           </span>
         </motion.div>
 
-        {/* ── THE PAIN — loss aversion, specificity ── */}
+        {/* ── THE PAIN — personal, self-reflective ── */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="text-[20px] sm:text-[24px] md:text-[30px] font-medium leading-snug mb-3 tracking-tight"
-          style={{ color: 'rgba(244,241,235,0.55)' }}
-        >
-          {no ? 'i måneden.' : 'per month.'}
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-[20px] sm:text-[24px] md:text-[30px] font-semibold leading-snug mb-10"
+          className="text-[22px] sm:text-[28px] md:text-[36px] font-semibold leading-snug mb-10 tracking-tight"
           style={{ color: '#f4f1eb' }}
         >
           {no
-            ? 'Tapt av norske bedrifter som ikke svarer telefonen.'
-            : 'Lost by Norwegian businesses that don\'t answer the phone.'}
-        </motion.p>
+            ? 'i uka bruker du på oppgaver AI gjør bedre.'
+            : 'a week you spend on tasks AI does better.'}
+        </motion.h1>
 
-        {/* ── THE TWIST — curiosity gap + solution ── */}
+        {/* ── THE SOLUTION — broad, covers everything ── */}
         <motion.p
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="text-[16px] md:text-[18px] max-w-xl mx-auto mb-10 leading-relaxed"
+          transition={{ duration: 0.5, delay: 0.35 }}
+          className="text-[15px] md:text-[18px] max-w-2xl mx-auto mb-10 leading-relaxed"
           style={{ color: 'rgba(244,241,235,0.5)' }}
         >
           {no
-            ? 'Arxon gir deg en AI-ansatt som svarer, booker og følger opp — døgnet rundt. Klar på 14 dager. Null risiko.'
-            : 'Arxon gives you an AI employee that answers, books, and follows up — 24/7. Ready in 14 days. Zero risk.'}
+            ? 'Telefon, booking, oppfølging, admin, markedsføring — Arxon automatiserer det som bremser bedriften din. 200+ ferdige løsninger. Klar på 14 dager.'
+            : 'Phone, booking, follow-up, admin, marketing — Arxon automates what slows your business down. 200+ ready-made solutions. Ready in 14 days.'}
         </motion.p>
 
-        {/* ── CTAs — curiosity-driven primary ── */}
+        {/* ── CTAs — curiosity-driven ── */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8"
         >
           <button
             onClick={ctaClick}
             className="gold-btn gold-btn-pulse rounded-xl py-4 px-10 text-[16px] font-bold inline-flex items-center gap-2 group"
-            aria-label={no ? 'Se hva du taper' : 'See what you\'re losing'}
+            aria-label={no ? 'Finn dine 15 timer' : 'Find your 15 hours'}
           >
-            {no ? 'Se hva du taper — gratis' : 'See what you\'re losing — free'}
+            {no ? 'Finn dine 15 timer — gratis' : 'Find your 15 hours — free'}
             <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
           </button>
           <button
@@ -141,7 +131,7 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.75 }}
+          transition={{ duration: 0.5, delay: 0.65 }}
           className="flex flex-wrap items-center justify-center gap-4 text-[12px]"
           style={{ color: 'rgba(244,241,235,0.35)' }}
         >
@@ -153,7 +143,7 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
           <span style={{ color: 'rgba(244,241,235,0.12)' }}>·</span>
           <span>{no ? 'Ingen binding' : 'No commitment'}</span>
           <span style={{ color: 'rgba(244,241,235,0.12)' }}>·</span>
-          <span>{no ? 'Gratis kartlegging' : 'Free assessment'}</span>
+          <span>{no ? '200+ automatiseringer' : '200+ automations'}</span>
         </motion.div>
       </motion.div>
     </section>
