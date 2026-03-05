@@ -8,7 +8,7 @@ import { ArrowLeft, ArrowRight, Globe, Menu, X } from 'lucide-react';
 const DESIGN = {
   gold: '#c9a96e',
   goldRgb: '201,169,110',
-  bg: '#0a0a0f',
+  bg: '#050510',
 };
 
 export default function AINorge2025() {
@@ -255,7 +255,7 @@ export default function AINorge2025() {
 
         /* Navigation */
         nav {
-          background-color: rgba(10, 10, 15, 0.95);
+          background-color: rgba(5, 5, 16, 0.95);
           backdrop-filter: blur(10px);
           border-bottom: 1px solid rgba(${DESIGN.goldRgb}, 0.1);
           position: sticky;
@@ -783,7 +783,7 @@ export default function AINorge2025() {
         {menuOpen && (
           <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 95,
-            background: 'rgba(10,10,15,0.98)', backdropFilter: 'blur(24px)',
+            background: 'rgba(5,5,16,0.98)', backdropFilter: 'blur(24px)',
             display: 'flex', flexDirection: 'column', padding: '0 24px',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 64, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>

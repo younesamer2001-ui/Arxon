@@ -131,7 +131,7 @@ export default function KundehistorierPage() {
   ]
 
   return (
-    <div style={{ minHeight: '100vh', background: `linear-gradient(180deg, ${bg} 0%, #0d0d15 50%, ${bg} 100%)`, color: '#f0f0f0', fontFamily: "'DM Sans', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: `${bg}`, color: '#f0f0f0', fontFamily: "'DM Sans', sans-serif" }}>
       <style>{globalStyles() + `@media(max-width:768px){.story-grid{grid-template-columns:1fr!important}}`}</style>
 
       <Nav />

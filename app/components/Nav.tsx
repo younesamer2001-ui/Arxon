@@ -35,7 +35,7 @@ export default function Nav({ sticky = false }: NavProps) {
 
   const navStyle: React.CSSProperties = sticky
     ? {
-        background: 'rgba(10,10,15,0.95)',
+        background: 'rgba(5,5,16,0.95)',
         backdropFilter: 'blur(20px)',
         borderBottom: `1px solid rgba(${goldRgb},0.1)`,
         padding: '0 24px',
@@ -188,7 +188,7 @@ export default function Nav({ sticky = false }: NavProps) {
       {menuOpen && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 95,
-          background: 'rgba(10,10,15,0.98)', padding: '80px 24px',
+          background: 'rgba(5,5,16,0.98)', padding: '80px 24px',
           display: 'flex', flexDirection: 'column', gap: 16,
         }}>
           <button onClick={() => setMenuOpen(false)} style={{

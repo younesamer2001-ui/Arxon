@@ -147,7 +147,7 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="no" suppressHydrationWarning>
+    <html lang="no" className="dark" suppressHydrationWarning>
       <head>
         {/* Google Analytics - DISABLED - TODO: Add GA measurement ID when Google account is created */}
         {/* <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX" />

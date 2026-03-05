@@ -384,7 +384,7 @@ Arxon is designed to make this job easier. We handle the complexity behind the s
           }
 
           html, body {
-            background-color: #0a0a0f;
+            background-color: #050510;
             color: #e8e8e8;
             font-family: 'DM Sans', sans-serif;
             line-height: 1.6;
@@ -395,7 +395,7 @@ Arxon is designed to make this job easier. We handle the complexity behind the s
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(10, 10, 15, 0.95);
+            background: rgba(5, 5, 16, 0.95);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(201, 169, 110, 0.1);
           }

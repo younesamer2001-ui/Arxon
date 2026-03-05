@@ -2,7 +2,7 @@ export default function KartleggingLoading() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#0a0a0f',
+      background: '#050510',
       color: '#f0f0f0',
       fontFamily: "'DM Sans', sans-serif",
       display: 'flex',

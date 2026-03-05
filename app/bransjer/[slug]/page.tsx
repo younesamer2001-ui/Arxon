@@ -19,8 +19,8 @@ import { useLanguage } from '@/lib/language-context'
 
 const gold = '#efc07b'
 const goldRgb = '239,192,123'
-const bgDark = '#0f1b27'
-const cardBg = '#16213e'
+const bgDark = '#050510'
+const cardBg = 'rgba(255,255,255,0.03)'
 
 const iconMap: Record<string, any> = {
   Hammer, Scissors, Scale, UtensilsCrossed, Home, HeartPulse,

@@ -18,8 +18,8 @@ import {
 
 const gold = '#efc07b'
 const goldRgb = '239,192,123'
-const bgDark = '#0f1b27'
-const cardBg = '#16213e'
+const bgDark = '#050510'
+const cardBg = 'rgba(255,255,255,0.03)'
 
 const complexityColor: Record<string, string> = {
   'Lav': '#4ade80', 'Middels': '#fbbf24', 'Høy': '#f87171',

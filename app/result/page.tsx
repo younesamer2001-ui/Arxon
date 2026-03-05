@@ -97,7 +97,7 @@ function ResultPageContent() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', background: `linear-gradient(180deg, ${bg} 0%, #0d0d15 50%, ${bg} 100%)`, color: '#f0f0f0', fontFamily: "'DM Sans', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '100vh', background: `${bg}`, color: '#f0f0f0', fontFamily: "'DM Sans', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <style>{globalStyles()}</style>
         <div style={{ textAlign: 'center' }}>
           <Loader2 size={32} color={gold} style={{ animation: 'spin 1s linear infinite', marginBottom: 16 }} />
@@ -110,7 +110,7 @@ function ResultPageContent() {
 
   if (!recommendation) {
     return (
-      <div style={{ minHeight: '100vh', background: `linear-gradient(180deg, ${bg} 0%, #0d0d15 50%, ${bg} 100%)`, color: '#f0f0f0', fontFamily: "'DM Sans', sans-serif" }}>
+      <div style={{ minHeight: '100vh', background: `${bg}`, color: '#f0f0f0', fontFamily: "'DM Sans', sans-serif" }}>
         <style>{globalStyles()}</style>
         <Nav />
         <section style={{ maxWidth: 600, margin: '0 auto', padding: '120px 24px', textAlign: 'center' }}>
@@ -129,7 +129,7 @@ function ResultPageContent() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: `linear-gradient(180deg, ${bg} 0%, #0d0d15 50%, ${bg} 100%)`, color: '#f0f0f0', fontFamily: "'DM Sans', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: `${bg}`, color: '#f0f0f0', fontFamily: "'DM Sans', sans-serif" }}>
       <style>{globalStyles()}</style>
       <Nav />
 
@@ -340,7 +340,7 @@ function ResultPageContent() {
 export default function ResultPage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', background: '#0a0a0f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '100vh', background: '#050510', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Loader2 size={32} color="#c9a96e" style={{ animation: 'spin 1s linear infinite' }} />
         <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
       </div>

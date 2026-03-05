@@ -221,7 +221,7 @@ export default function DemoPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: `linear-gradient(180deg, ${bg} 0%, #0d0d15 50%, ${bg} 100%)`, color: '#f0f0f0', fontFamily: "'DM Sans', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: `${bg}`, color: '#f0f0f0', fontFamily: "'DM Sans', sans-serif" }}>
       <style>{globalStyles(`
         @keyframes pulse-gold { 0%, 100% { box-shadow: 0 0 20px rgba(${goldRgb},0.15); } 50% { box-shadow: 0 0 40px rgba(${goldRgb},0.3); } }
       `)}</style>

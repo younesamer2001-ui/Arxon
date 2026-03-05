@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 const gold = '#c9a96e';
 const goldRgb = '201,169,110';
-const bg = '#0a0a0f';
+const bg = '#050510';
 
 export default function UbesvarteAnropPage() {
   const [langToggle, setLangToggle] = useState('no');
@@ -55,7 +55,7 @@ export default function UbesvarteAnropPage() {
           border-bottom: 1px solid rgba(${goldRgb}, 0.1);
           position: sticky;
           top: 0;
-          background: rgba(10, 10, 15, 0.95);
+          background: rgba(5, 5, 16, 0.95);
           backdrop-filter: blur(10px);
           z-index: 100;
         }

@@ -1,8 +1,8 @@
 /* ────────────────────────────────────────────
    DESIGN TOKENS (Midnight Opulence)
    ──────────────────────────────────────────── */
-export const bgDark = '#0f1b27'
-export const cardBg = '#16213e'
+export const bgDark = '#050510'
+export const cardBg = 'rgba(255,255,255,0.03)'
 export const cardBorder = 'rgba(255,255,255,0.06)'
 export const textPrimary = '#f4f1eb'
 export const textSecondary = 'rgba(255,255,255,0.6)'

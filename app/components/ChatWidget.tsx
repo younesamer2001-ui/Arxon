@@ -5,7 +5,7 @@ import Vapi from '@vapi-ai/web'
 
 /* ───────── constants ───────── */
 const gold = '#c9a96e'
-const bg = '#0d0d14'
+const bg = '#050510'
 const inputBg = '#1a1a28'
 const textPrimary = '#e8e8ed'
 const textSecondary = '#8a8a9a'
