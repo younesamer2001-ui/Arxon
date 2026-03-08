@@ -8,18 +8,18 @@ export async function POST(req: NextRequest) {
     const {
       automations,       // Array of { name, setupPrice, monthlyPrice, complexity, industry }
       billingMode,       // 'monthly' | 'annual'
-      setupTotal,        // number in NOK (not øre)
-      monthlyTotal,      // number in NOK (not øre)
+      setupTotal,        // number in NOK (not Ã¸re)
+      monthlyTotal,      // number in NOK (not Ã¸re)
       discountRate,      // e.g. 0.05 for 5%
       customerEmail,     // optional pre-fill
       customerName,      // optional
       companyName,       // optional
-      industry,          // e.g. "Bygg & Håndverk"
+      industry,          // e.g. "Bygg & HÃ¥ndverk"
     } = body
 
     if (!automations || automations.length === 0) {
       return NextResponse.json(
-        { error: 'Velg minst én automatisering' },
+        { error: 'Velg minst Ã©n automatisering' },
         { status: 400 }
       )
     }
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
             name: 'Oppsett & implementering',
             description: `Skreddersydd oppsett: ${setupDescription}`,
           },
-          unit_amount: Math.round(setupTotal * 100), // Convert to øre
+          unit_amount: Math.round(setupTotal * 100), // Convert to Ã¸re
         },
         quantity: 1,
       })
@@ -65,10 +65,10 @@ export async function POST(req: NextRequest) {
         price_data: {
           currency: 'nok',
           product_data: {
-            name: `Arxon AI – ${automations.length} automatisering${automations.length > 1 ? 'er' : ''}`,
+            name: `Arxon AI â ${automations.length} automatisering${automations.length > 1 ? 'er' : ''}`,
             description: monthlyDescription,
           },
-          unit_amount: Math.round(effectiveMonthly * 100), // Convert to øre
+          unit_amount: Math.round(effectiveMonthly * 100), // Convert to Ã¸re
           recurring: {
             interval: isAnnual ? 'year' : 'month',
             ...(isAnnual ? {} : {}),
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
 
     if (orderError) {
       console.error('Supabase order error:', orderError)
-      // Continue even if Supabase fails — Stripe is more critical
+      // Continue even if Supabase fails â Stripe is more critical
     }
 
     // Create Stripe Checkout Session
@@ -110,7 +110,6 @@ export async function POST(req: NextRequest) {
       locale: 'nb' as any, // Norwegian
       payment_method_types: ['card'],
       billing_address_collection: 'required',
-      customer_creation: 'always',
       metadata: {
         order_id: order?.id || '',
         industry: industry || '',
