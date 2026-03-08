@@ -16,6 +16,7 @@ import {
   pricingAutomations, pricingIndustries, PricingAutomation,
   PRICING, getDiscountRate, formatKr,
 } from '@/lib/pricing'
+import { useCalBooking } from '@/lib/useCalBooking'
 
 const gold = '#efc07b'
 const goldRgb = '239,192,123'
@@ -135,6 +136,7 @@ function AutomationRow({
 export default function PakkebyggerPage() {
   const { lang } = useLanguage()
   const no = lang === 'no'
+  const openBooking = useCalBooking()
   const [selectedIndustry, setSelectedIndustry] = useState('')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [billing, setBilling] = useState<BillingMode>('monthly')
@@ -511,15 +513,19 @@ export default function PakkebyggerPage() {
                         )}
                       </button>
 
-                      <Link href="/kartlegging" style={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                        padding: '12px 20px', borderRadius: 10, fontWeight: 500,
-                        fontSize: 13, textDecoration: 'none',
-                        color: gold, border: `1px solid rgba(${goldRgb},0.2)`,
-                        transition: 'all 0.2s',
-                      }}>
-                        <CalendarDays size={15} /> {no ? 'Book et gratis rådgivningsmøte' : 'Book a free consultation'}
-                      </Link>
+                      <button onClick={openBooking} style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '12px 20px', borderRadius: 10, fontWeight: 500,
+                fontSize: 13, cursor: 'pointer', background: 'transparent',
+                color: gold, border: `1px solid rgba(${goldRgb},0.2)`,
+                transition: 'all 0.2s',
+              }}
+                data-cal-namespace="gratis-ai-konsultasjon"
+                data-cal-link="arxon/gratis-ai-konsultasjon"
+                data-cal-config='{"layout":"month_view"}'
+              >
+                <CalendarDays size={15} /> {no ? 'Book et gratis rådgivningsmøte' : 'Book a free consultation'}
+              </button>
                     </div>
 
                     {/* Trust */}
