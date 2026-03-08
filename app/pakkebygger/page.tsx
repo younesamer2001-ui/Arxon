@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowRight, Check, ChevronDown, Zap, Clock, AlertTriangle, Package,
@@ -139,6 +140,8 @@ export default function PakkebyggerPage() {
   const [billing, setBilling] = useState<BillingMode>('monthly')
   const [showDropdown, setShowDropdown] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
+  const router = useRouter()
 
   const industryAutomations = useMemo(() =>
     selectedIndustry
@@ -161,6 +164,42 @@ export default function PakkebyggerPage() {
     ? monthlyAfterQuantity * (1 - PRICING.annualDiscount)
     : monthlyAfterQuantity
   const annualTotal = monthlyFinal * 12
+
+  const handleCheckout = useCallback(async () => {
+    if (selectedAutomations.length === 0) return
+    setCheckoutLoading(true)
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          automations: selectedAutomations.map(a => ({
+            name: a.name,
+            setupPrice: a.setupPrice,
+            monthlyPrice: a.monthlyPrice,
+            complexity: a.complexity,
+            industry: a.industry,
+          })),
+          billingMode: billing,
+          setupTotal: totalSetup,
+          monthlyTotal: monthlyFinal,
+          discountRate,
+          industry: selectedIndustry,
+        }),
+      })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        alert(data.error || 'Noe gikk galt. Prøv igjen.')
+        setCheckoutLoading(false)
+      }
+    } catch (err) {
+      console.error('Checkout error:', err)
+      alert('Kunne ikke starte betaling. Sjekk internettforbindelsen og prøv igjen.')
+      setCheckoutLoading(false)
+    }
+  }, [selectedAutomations, billing, totalSetup, monthlyFinal, discountRate, selectedIndustry])
 
   function toggleAutomation(name: string) {
     setSelectedIds(prev => {
@@ -455,13 +494,22 @@ export default function PakkebyggerPage() {
 
                     {/* CTA buttons */}
                     <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <Link href="/kartlegging" className="cta-shimmer" style={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                        padding: '14px 20px', borderRadius: 10, fontWeight: 600,
-                        fontSize: 14, textDecoration: 'none', color: bgDark,
-                      }}>
-                        <ShoppingCart size={16} /> {no ? 'Bestill denne pakken' : 'Order this package'}
-                      </Link>
+                      <button
+                        onClick={handleCheckout}
+                        disabled={checkoutLoading || count === 0}
+                        className="cta-shimmer"
+                        style={{
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                          padding: '14px 20px', borderRadius: 10, fontWeight: 600,
+                          fontSize: 14, color: bgDark, border: 'none', cursor: checkoutLoading ? 'wait' : 'pointer',
+                          opacity: checkoutLoading ? 0.7 : 1, width: '100%',
+                        }}>
+                        {checkoutLoading ? (
+                          <>{no ? 'Går til betaling...' : 'Redirecting...'}</>
+                        ) : (
+                          <><ShoppingCart size={16} /> {no ? 'Bestill denne pakken' : 'Order this package'}</>
+                        )}
+                      </button>
 
                       <Link href="/kartlegging" style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -717,13 +765,18 @@ export default function PakkebyggerPage() {
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{count} valgt</div>
             <div style={{ fontSize: 18, fontWeight: 700, color: gold }}>{formatKr(Math.round(monthlyFinal))}/mnd</div>
           </div>
-          <Link href="/kartlegging" className="cta-shimmer" style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            padding: '10px 20px', borderRadius: 10, fontWeight: 600,
-            fontSize: 13, textDecoration: 'none', color: bgDark,
-          }}>
-            Bestill <ArrowRight size={14} />
-          </Link>
+          <button
+            onClick={handleCheckout}
+            disabled={checkoutLoading || count === 0}
+            className="cta-shimmer"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '10px 20px', borderRadius: 10, fontWeight: 600,
+              fontSize: 13, color: bgDark, border: 'none', cursor: checkoutLoading ? 'wait' : 'pointer',
+              opacity: checkoutLoading ? 0.7 : 1,
+            }}>
+            {checkoutLoading ? 'Venter...' : 'Bestill'} <ArrowRight size={14} />
+          </button>
         </div>
       )}
 
