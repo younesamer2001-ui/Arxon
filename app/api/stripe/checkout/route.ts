@@ -8,18 +8,18 @@ export async function POST(req: NextRequest) {
     const {
       automations,       // Array of { name, setupPrice, monthlyPrice, complexity, industry }
       billingMode,       // 'monthly' | 'annual'
-      setupTotal,        // number in NOK (not Ã¸re)
-      monthlyTotal,      // number in NOK (not Ã¸re)
+      setupTotal,        // number in NOK (not øre)
+      monthlyTotal,      // number in NOK (not øre)
       discountRate,      // e.g. 0.05 for 5%
       customerEmail,     // optional pre-fill
       customerName,      // optional
       companyName,       // optional
-      industry,          // e.g. "Bygg & HÃ¥ndverk"
+      industry,          // e.g. "Bygg & Håndverk"
     } = body
 
     if (!automations || automations.length === 0) {
       return NextResponse.json(
-        { error: 'Velg minst Ã©n automatisering' },
+        { error: 'Velg minst én automatisering' },
         { status: 400 }
       )
     }
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
             name: 'Oppsett & implementering',
             description: `Skreddersydd oppsett: ${setupDescription}`,
           },
-          unit_amount: Math.round(setupTotal * 100), // Convert to Ã¸re
+          unit_amount: Math.round(setupTotal * 100), // Convert to øre
         },
         quantity: 1,
       })
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
             name: `Arxon AI â ${automations.length} automatisering${automations.length > 1 ? 'er' : ''}`,
             description: monthlyDescription,
           },
-          unit_amount: Math.round(effectiveMonthly * 100), // Convert to Ã¸re
+          unit_amount: Math.round(effectiveMonthly * 100), // Convert to øre
           recurring: {
             interval: isAnnual ? 'year' : 'month',
             ...(isAnnual ? {} : {}),
