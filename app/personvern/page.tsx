@@ -1,149 +1,85 @@
 'use client'
-
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/language-context'
+import { motion } from 'framer-motion'
+import { Shield, Mail, Clock, Database, Eye, Trash2, Lock, Server, Globe, UserCheck } from 'lucide-react'
 import Nav from '@/app/components/Nav'
 import Footer from '@/app/components/Footer'
-import { gold, bg, globalStyles } from '@/lib/constants'
+import { gold, goldRgb, bg, globalStyles } from '@/lib/constants'
 
 export default function PersonvernPage() {
-  const router = useRouter()
   const { lang } = useLanguage()
   const no = lang === 'no'
+  const fadeUp = { initial: { opacity: 0, y: 28 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.55 } }
+  const updated = '8. mars 2026'
+  const updatedEn = 'March 8, 2026'
 
-  const sectionStyle: React.CSSProperties = { marginBottom: 32 }
-  const h2Style: React.CSSProperties = { fontSize: 20, fontWeight: 600, color: '#fff', marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }
-  const pStyle: React.CSSProperties = { fontSize: 14, lineHeight: 1.8, color: 'rgba(255,255,255,0.55)', fontFamily: "'DM Sans', sans-serif" }
+  const sections = no ? [
+    { icon: <UserCheck size={20} />, title: '1. Behandlingsansvarlig', content: 'Arxon, org.nr. [kommer], kontakt@arxon.no, er behandlingsansvarlig for personopplysninger som samles inn via arxon.no og tilknyttede tjenester. Henvendelser om personvern kan rettes til kontakt@arxon.no.' },
+    { icon: <Database size={20} />, title: '2. Hvilke opplysninger vi samler inn', content: 'Vi samler inn fÃ¸lgende kategorier av personopplysninger:\n\nâ¢ Kontaktinformasjon: Navn, e-postadresse, telefonnummer (ved registrering og bookinger)\nâ¢ Betalingsinformasjon: Kortinformasjon behandles direkte av Stripe â vi lagrer aldri fullstendige kortnummer\nâ¢ Samtaledata fra AI-tjenester: Opptak og transkripsjoner fra AI-telefonsamtaler via Vapi/OpenAI\nâ¢ Tekniske data: IP-adresse, nettlesertype, enhetsinfo, besÃ¸kstidspunkt\nâ¢ Brukerinnstillinger: SprÃ¥kpreferanser og tjenestevalg' },
+    { icon: <Eye size={20} />, title: '3. FormÃ¥l og rettslig grunnlag', content: 'Vi behandler opplysningene for:\n\nâ¢ Levering av tjenester (GDPR art. 6(1)(b)): Oppfylle avtalen om AI-telefonsvarer og automatisering\nâ¢ Samtykke (art. 6(1)(a)): MarkedsfÃ¸ring og nyhetsbrev â kun med ditt aktive samtykke\nâ¢ Rettslig forpliktelse (art. 6(1)(c)): BokfÃ¸ringsloven krever lagring av fakturadata i 5 Ã¥r\nâ¢ Berettiget interesse (art. 6(1)(f)): FeilsÃ¸king, sikkerhet og forbedring av tjenestene' },
+    { icon: <Server size={20} />, title: '4. AI-spesifikk behandling', content: 'AI-samtaler via Vapi/OpenAI behandles som fÃ¸lger:\n\nâ¢ Opptak lagres midlertidig for transkripsjon og analyse\nâ¢ Samtaledata brukes til Ã¥ forbedre svarene og tjenesteleveransen\nâ¢ Du kan be om sletting av samtaledata nÃ¥r som helst\nâ¢ OpenAI fungerer som databehandler under vÃ¥r databehandleravtale\nâ¢ AI-genererte svar er automatiserte, men ingen juridisk bindende beslutninger tas uten menneskelig kontroll' },
+    { icon: <Globe size={20} />, title: '5. Deling og overfÃ¸ring av data', content: 'Vi deler opplysninger med fÃ¸lgende underleverandÃ¸rer (databehandlere):\n\nâ¢ Stripe (betalingsbehandling) â EU/US, SCCs\nâ¢ Vercel (hosting) â EU/US, SCCs\nâ¢ Supabase (database) â EU-region\nâ¢ Cal.com (booking) â EU/US, SCCs\nâ¢ Vapi/OpenAI (AI-samtaler) â US, SCCs og DPA\nâ¢ Google Workspace (e-post) â EU/US, SCCs\n\nAlle overfÃ¸ringer til land utenfor EÃS skjer med standard personvernbestemmelser (SCCs) i henhold til GDPR kap. V.' },
+    { icon: <Clock size={20} />, title: '6. Lagringstid', content: 'â¢ Kontaktinformasjon: SÃ¥ lenge kundeforholdet varer, pluss 12 mÃ¥neder\nâ¢ Betalingsdata: 5 Ã¥r (bokfÃ¸ringsloven)\nâ¢ AI-samtaledata: Maks 90 dager, med mindre du ber om tidligere sletting\nâ¢ Tekniske logger: 30 dager\nâ¢ MarkedsfÃ¸ringssamtykke: Til samtykket trekkes tilbake' },
+    { icon: <Shield size={20} />, title: '7. Dine rettigheter', content: 'Etter GDPR art. 15â22 har du rett til:\n\nâ¢ Innsyn: Be om kopi av alle opplysninger vi har om deg\nâ¢ Retting: Korrigere uriktige opplysninger\nâ¢ Sletting: FÃ¥ opplysninger slettet (Â«retten til Ã¥ bli glemtÂ»)\nâ¢ Begrensning: Begrense behandlingen i visse situasjoner\nâ¢ Dataportabilitet: Motta dine data i et maskinlesbart format\nâ¢ Innsigelse: Protestere mot behandling basert pÃ¥ berettiget interesse\n\nSend forespÃ¸rsler til kontakt@arxon.no. Vi svarer innen 30 dager.' },
+    { icon: <Eye size={20} />, title: '8. Informasjonskapsler (cookies)', content: 'Vi bruker kun nÃ¸dvendige informasjonskapsler for at nettsiden skal fungere. Vi bruker ingen tredjeparts sporings- eller analysecookies. SprÃ¥kpreferanser lagres lokalt i nettleseren din (localStorage).' },
+    { icon: <Lock size={20} />, title: '9. Sikkerhet', content: 'Vi beskytter dine data med:\n\nâ¢ Kryptering i transit (TLS/SSL) og i hvile\nâ¢ Tilgangskontroll med rollebaserte rettigheter\nâ¢ Regelmessig sikkerhetsgjennomgang av systemer og underleverandÃ¸rer\nâ¢ HendelseshÃ¥ndtering og varsling ved eventuelle brudd, i henhold til GDPR art. 33â34' },
+    { icon: <Mail size={20} />, title: '10. Klager', content: 'Du har rett til Ã¥ klage til Datatilsynet (datatilsynet.no) dersom du mener vi behandler personopplysningene dine i strid med regelverket.\n\nKontakt oss fÃ¸rst pÃ¥ kontakt@arxon.no â vi Ã¸nsker Ã¥ lÃ¸se eventuelle bekymringer direkte.' },
+  ] : [
+    { icon: <UserCheck size={20} />, title: '1. Data Controller', content: 'Arxon, org. no. [pending], kontakt@arxon.no, is the data controller for personal data collected through arxon.no and related services. Privacy inquiries can be directed to kontakt@arxon.no.' },
+    { icon: <Database size={20} />, title: '2. Data We Collect', content: 'We collect the following categories of personal data:\n\nâ¢ Contact information: Name, email address, phone number (during registration and bookings)\nâ¢ Payment information: Card details are processed directly by Stripe â we never store complete card numbers\nâ¢ AI conversation data: Recordings and transcriptions from AI phone calls via Vapi/OpenAI\nâ¢ Technical data: IP address, browser type, device info, visit timestamps\nâ¢ User preferences: Language settings and service selections' },
+    { icon: <Eye size={20} />, title: '3. Purposes and Legal Basis', content: 'We process data for:\n\nâ¢ Service delivery (GDPR Art. 6(1)(b)): Fulfilling the agreement for AI receptionist and automation services\nâ¢ Consent (Art. 6(1)(a)): Marketing and newsletters â only with your active consent\nâ¢ Legal obligation (Art. 6(1)(c)): Norwegian Bookkeeping Act requires invoice data retention for 5 years\nâ¢ Legitimate interest (Art. 6(1)(f)): Troubleshooting, security, and service improvements' },
+    { icon: <Server size={20} />, title: '4. AI-Specific Processing', content: 'AI conversations via Vapi/OpenAI are processed as follows:\n\nâ¢ Recordings are temporarily stored for transcription and analysis\nâ¢ Conversation data is used to improve responses and service delivery\nâ¢ You may request deletion of conversation data at any time\nâ¢ OpenAI acts as a data processor under our Data Processing Agreement\nâ¢ AI-generated responses are automated, but no legally binding decisions are made without human oversight' },
+    { icon: <Globe size={20} />, title: '5. Data Sharing and Transfers', content: 'We share data with the following sub-processors:\n\nâ¢ Stripe (payment processing) â EU/US, SCCs\nâ¢ Vercel (hosting) â EU/US, SCCs\nâ¢ Supabase (database) â EU region\nâ¢ Cal.com (booking) â EU/US, SCCs\nâ¢ Vapi/OpenAI (AI conversations) â US, SCCs and DPA\nâ¢ Google Workspace (email) â EU/US, SCCs\n\nAll transfers outside the EEA use Standard Contractual Clauses (SCCs) per GDPR Chapter V.' },
+    { icon: <Clock size={20} />, title: '6. Retention Periods', content: 'â¢ Contact information: Duration of customer relationship plus 12 months\nâ¢ Payment data: 5 years (Norwegian Bookkeeping Act)\nâ¢ AI conversation data: Maximum 90 days, unless earlier deletion is requested\nâ¢ Technical logs: 30 days\nâ¢ Marketing consent: Until consent is withdrawn' },
+    { icon: <Shield size={20} />, title: '7. Your Rights', content: 'Under GDPR Articles 15â22, you have the right to:\n\nâ¢ Access: Request a copy of all data we hold about you\nâ¢ Rectification: Correct inaccurate data\nâ¢ Erasure: Have your data deleted ("right to be forgotten")\nâ¢ Restriction: Restrict processing in certain situations\nâ¢ Data portability: Receive your data in a machine-readable format\nâ¢ Object: Object to processing based on legitimate interest\n\nSend requests to kontakt@arxon.no. We respond within 30 days.' },
+    { icon: <Eye size={20} />, title: '8. Cookies', content: 'We only use essential cookies required for the website to function. We do not use any third-party tracking or analytics cookies. Language preferences are stored locally in your browser (localStorage).' },
+    { icon: <Lock size={20} />, title: '9. Security', content: 'We protect your data with:\n\nâ¢ Encryption in transit (TLS/SSL) and at rest\nâ¢ Access control with role-based permissions\nâ¢ Regular security reviews of systems and sub-processors\nâ¢ Incident handling and notification in case of breaches, per GDPR Art. 33â34' },
+    { icon: <Mail size={20} />, title: '10. Complaints', content: 'You have the right to file a complaint with the Norwegian Data Protection Authority (datatilsynet.no) if you believe we process your personal data in violation of regulations.\n\nPlease contact us first at kontakt@arxon.no â we want to resolve any concerns directly.' },
+  ]
+
+  const icons = [<UserCheck size={20} key="uc" />, <Database size={20} key="db" />, <Eye size={20} key="ey" />, <Server size={20} key="sv" />, <Globe size={20} key="gl" />, <Clock size={20} key="cl" />, <Shield size={20} key="sh" />, <Eye size={20} key="ey2" />, <Lock size={20} key="lk" />, <Mail size={20} key="ml" />]
 
   return (
-    <div style={{ background: bg, minHeight: '100vh', color: '#fff' }}>
+    <div style={{ minHeight: '100vh', background: bg, color: '#f0f0f0', fontFamily: "'DM Sans', sans-serif" }}>
       <style>{globalStyles()}</style>
       <Nav />
 
-      <main style={{ maxWidth: 800, margin: '0 auto', padding: '40px 24px 80px' }}>
-        <h1 style={{ fontSize: 32, fontWeight: 700, color: '#fff', marginBottom: 8, fontFamily: "'DM Sans', sans-serif" }}>
-          {no ? 'Personvernerklæring' : 'Privacy Policy'}
-        </h1>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', marginBottom: 48 }}>
-          {no ? 'Sist oppdatert:' : 'Last updated:'} {new Date().toLocaleDateString(no ? 'nb-NO' : 'en-US')}
-        </p>
-
-        <div style={sectionStyle}>
-          <h2 style={h2Style}>{no ? '1. Hvem er vi?' : '1. Who are we?'}</h2>
-          <p style={pStyle}>
-            {no ? 'Arxon er en norsk teknologibedrift som leverer AI-baserte løsninger for bedrifter, inkludert AI-telefonsvarer, automatisert booking og kundekommunikasjon. Vi er behandlingsansvarlig for personopplysninger som samles inn gjennom våre tjenester og nettside.' : 'Arxon is a Norwegian technology company that provides AI-powered solutions for businesses, including AI phone services, automated booking, and customer communication. We are responsible for personal data collected through our services and website.'}
+      <section style={{ maxWidth: 800, margin: '0 auto', padding: '140px 24px 80px' }}>
+        <motion.div {...fadeUp} style={{ textAlign: 'center', marginBottom: 56 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: `rgba(${goldRgb},0.08)`, border: `1px solid rgba(${goldRgb},0.15)`, borderRadius: 999, padding: '8px 18px', marginBottom: 20 }}>
+            <Shield size={14} style={{ color: gold }} />
+            <span style={{ color: gold, fontSize: 13, fontWeight: 500 }}>{no ? 'Personvern' : 'Privacy Policy'}</span>
+          </div>
+          <h1 style={{ fontSize: 'clamp(28px,5vw,44px)', fontWeight: 700, fontFamily: "'Playfair Display', serif", color: '#fff', marginBottom: 16 }}>
+            {no ? 'PersonvernerklÃ¦ring' : 'Privacy Policy'}
+          </h1>
+          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>
+            {no ? `Sist oppdatert: ${updated}` : `Last updated: ${updatedEn}`}
           </p>
+        </motion.div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {sections.map((s, i) => (
+            <motion.div key={i} {...fadeUp} transition={{ duration: 0.55, delay: i * 0.04 }}
+              style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14, padding: '28px 28px 24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                <div style={{ color: gold }}>{s.icon}</div>
+                <h2 style={{ fontSize: 17, fontWeight: 600, color: '#fff', margin: 0 }}>{s.title}</h2>
+              </div>
+              <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 14.5, lineHeight: 1.8, whiteSpace: 'pre-line' }}>{s.content}</div>
+            </motion.div>
+          ))}
         </div>
 
-        <div style={sectionStyle}>
-          <h2 style={h2Style}>{no ? '2. Hvilke opplysninger samler vi inn?' : '2. What information do we collect?'}</h2>
-          <p style={pStyle}>
-            {no ? 'Vi samler inn følgende kategorier av personopplysninger: kontaktinformasjon (navn, e-postadresse, telefonnummer) som du oppgir via kartleggingsskjemaet eller kontaktskjemaer, bedriftsinformasjon (firmanavn, bransje, antall ansatte) for å kunne tilpasse våre tjenester, teknisk data (IP-adresse, nettlesertype, enhetsinformasjon) som samles automatisk for å forbedre brukeropplevelsen, og bruksdata (sidevisninger, klikk, tid brukt) via analyseverktøy.' : 'We collect the following categories of personal data: contact information (name, email address, phone number) that you provide via assessment forms or contact forms, business information (company name, industry, number of employees) to tailor our services, technical data (IP address, browser type, device information) collected automatically to improve user experience, and usage data (page views, clicks, time spent) via analytics tools.'}
+        <motion.div {...fadeUp} style={{ textAlign: 'center', marginTop: 48, padding: '28px', background: `rgba(${goldRgb},0.04)`, border: `1px solid rgba(${goldRgb},0.1)`, borderRadius: 14 }}>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, margin: 0 }}>
+            {no ? 'SpÃ¸rsmÃ¥l om personvern? Kontakt oss pÃ¥ ' : 'Privacy questions? Contact us at '}
+            <a href="mailto:kontakt@arxon.no" style={{ color: gold, textDecoration: 'none' }}>kontakt@arxon.no</a>
           </p>
-        </div>
+        </motion.div>
+      </section>
 
-        <div style={sectionStyle}>
-          <h2 style={h2Style}>{no ? '3. Hvorfor samler vi inn opplysninger?' : '3. Why do we collect information?'}</h2>
-          <p style={pStyle}>
-            {no ? 'Vi bruker personopplysningene dine for å levere og forbedre våre tjenester, kontakte deg angående forespørsler og kartlegginger du har gjennomført, sende relevant informasjon om våre løsninger (kun med ditt samtykke), analysere og forbedre nettsiden og brukeropplevelsen, og overholde juridiske forpliktelser.' : 'We use your personal data to deliver and improve our services, contact you regarding requests and assessments you have completed, send relevant information about our solutions (with your consent only), analyze and improve the website and user experience, and comply with legal obligations.'}
-          </p>
-        </div>
-
-        <div style={sectionStyle}>
-          <h2 style={h2Style}>{no ? '4. Rettslig grunnlag' : '4. Legal basis'}</h2>
-          <p style={pStyle}>
-            {no ? 'Vi behandler personopplysninger basert på samtykke (f.eks. når du fyller ut kartleggingsskjemaet), berettiget interesse (f.eks. for å forbedre tjenestene våre), og oppfyllelse av avtale (f.eks. når vi leverer en tjeneste du har bestilt).' : 'We process personal data based on consent (e.g., when you fill out assessment forms), legitimate interest (e.g., to improve our services), and contract fulfillment (e.g., when we deliver a service you have ordered).'}
-          </p>
-        </div>
-
-        <div style={sectionStyle}>
-          <h2 style={h2Style}>{no ? '5. Deling av opplysninger' : '5. Sharing of information'}</h2>
-          <p style={pStyle}>
-            {no ? 'Vi selger aldri dine personopplysninger til tredjeparter. Vi kan dele opplysninger med tjenesteleverandører som hjelper oss med drift (f.eks. hosting, e-post, analyseverktøy), men kun i den grad det er nødvendig og under strenge databehandleravtaler. Alle data lagres i EU/EØS-området.' : 'We never sell your personal data to third parties. We may share information with service providers who assist us with operations (e.g., hosting, email, analytics tools), but only to the extent necessary and under strict data processing agreements. All data is stored in the EU/EEA region.'}
-          </p>
-        </div>
-
-        <div style={sectionStyle}>
-          <h2 style={h2Style}>{no ? '6. Lagring og sikkerhet' : '6. Storage and security'}</h2>
-          <p style={pStyle}>
-            {no ? 'Personopplysninger lagres så lenge det er nødvendig for formålet de ble samlet inn for, eller så lenge loven krever det. Vi bruker industristandarder for sikkerhet, inkludert kryptering, sikre servere og tilgangskontroll.' : 'Personal data is stored for as long as necessary for the purposes it was collected for, or as long as the law requires. We use industry-standard security measures, including encryption, secure servers, and access controls.'}
-          </p>
-        </div>
-
-        <div style={sectionStyle}>
-          <h2 style={h2Style}>{no ? '7. Dine rettigheter' : '7. Your rights'}</h2>
-          <p style={pStyle}>
-            {no ? 'I henhold til GDPR og norsk personvernlovgivning har du rett til innsyn i hvilke opplysninger vi har om deg, retting av uriktige opplysninger, sletting av dine opplysninger, begrensning av behandlingen, dataportabilitet, og å trekke tilbake samtykke når som helst. For å utøve dine rettigheter, kontakt oss på kontakt@arxon.no.' : 'Under GDPR and Norwegian privacy legislation, you have the right to access information we hold about you, correct inaccurate information, delete your information, restrict processing, data portability, and withdraw consent at any time. To exercise your rights, contact us at kontakt@arxon.no.'}
-          </p>
-        </div>
-
-        <div style={sectionStyle}>
-          <h2 style={h2Style}>{no ? '8. Informasjonskapsler (cookies)' : '8. Cookies'}</h2>
-          <p style={pStyle}>
-            {no ? 'Vi bruker nødvendige informasjonskapsler for at nettsiden skal fungere korrekt, og analytiske informasjonskapsler for å forstå hvordan besøkende bruker nettsiden. Du kan administrere dine cookie-preferanser i nettleserinnstillingene.' : 'We use necessary cookies to ensure the website functions properly, and analytical cookies to understand how visitors use the website. You can manage your cookie preferences in your browser settings.'}
-          </p>
-        </div>
-
-        <div style={sectionStyle}>
-          <h2 style={h2Style}>{no ? '9. AI-behandling' : '9. AI Processing'}</h2>
-          <p style={pStyle}>
-            {no
-              ? 'Arxon bruker Anthropic Claude for AI-analyse av kartleggingsdata. Personopplysninger sendes til Anthropic sin API for analyse, deretter slettes umiddelbart. AI-prosesseringen er GDPR-kompatibel og data lagres ikke for retrening.'
-              : 'Arxon uses Anthropic Claude for AI analysis of assessment data. Personal data is sent to Anthropic\'s API for analysis, then deleted immediately. AI processing is GDPR-compliant and data is not stored for retraining.'
-            }
-          </p>
-        </div>
-
-        <div style={sectionStyle}>
-          <h2 style={h2Style}>{no ? '10. Databehandlere' : '10. Data Processors'}</h2>
-          <p style={pStyle}>
-            {no
-              ? 'Vi bruker følgende databehandlere: Anthropic (AI-analyse), Resend (e-post), Supabase (database), og Vapi (telefoniintegrasjon). Alle databehandleravtaler er i samsvar med GDPR.'
-              : 'We use the following data processors: Anthropic (AI analysis), Resend (email), Supabase (database), and Vapi (phone integration). All data processing agreements comply with GDPR.'
-            }
-          </p>
-        </div>
-
-        <div style={sectionStyle}>
-          <h2 style={h2Style}>{no ? '11. Dataoppbevaring' : '11. Data Retention'}</h2>
-          <p style={pStyle}>
-            {no
-              ? 'Personopplysninger oppbevares i 12 måneder fra dato for innsamling, deretter slettes de permanent.'
-              : 'Personal data is retained for 12 months from the date of collection, then permanently deleted.'
-            }
-          </p>
-        </div>
-
-        <div style={sectionStyle}>
-          <h2 style={h2Style}>{no ? '12. Databruddmelding' : '12. Data Breach Notification'}</h2>
-          <p style={pStyle}>
-            {no
-              ? 'I tilfelle et databrudd vil vi varsle berørte personer innen 72 timer og rapportere til relevante myndigheter i henhold til GDPR.'
-              : 'In case of a data breach, we will notify affected individuals within 72 hours and report to relevant authorities in accordance with GDPR.'
-            }
-          </p>
-        </div>
-
-        <div style={sectionStyle}>
-          <h2 style={h2Style}>{no ? '13. Endringer i denne personvernerklæringen' : '13. Changes to This Privacy Policy'}</h2>
-          <p style={pStyle}>
-            {no
-              ? 'Vi kan oppdatere denne personvernerklæringen fra tid til annen. Vi vil varsle deg om betydelige endringer gjennom nettsiden.'
-              : 'We may update this privacy policy from time to time. We will notify you of significant changes through the website.'
-            }
-          </p>
-        </div>
-
-        <div style={sectionStyle}>
-          <h2 style={h2Style}>{no ? '14. Kontakt oss' : '14. Contact us'}</h2>
-          <p style={pStyle}>
-            {no ? 'Har du spørsmål om vår behandling av personopplysninger? Kontakt oss på kontakt@arxon.no.' : 'Do you have questions about how we process your personal data? Contact us at kontakt@arxon.no.'}
-          </p>
-        </div>
-
-      </main>
-      <Footer minimal />
+      <Footer />
     </div>
   )
 }
