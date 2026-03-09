@@ -146,10 +146,17 @@ async function updateWorkflowStatuses(orderId: string) {
     // Get all workflows for this order
     const { data: workflows } = await supabaseAdmin
       .from('customer_workflows')
-      .select('id, required_integrations, workflow_status')
+      .select('id, automation_name, required_integrations, workflow_status')
       .eq('order_id', orderId)
 
     if (!workflows) return
+
+    // Get order details for notification
+    const { data: orderData } = await supabaseAdmin
+      .from('orders')
+      .select('customer_email, customer_name')
+      .eq('id', orderId)
+      .single()
 
     // Update each workflow's connected_integrations and status
     for (const wf of workflows) {
@@ -160,6 +167,18 @@ async function updateWorkflowStatuses(orderId: string) {
       let newStatus = wf.workflow_status
       if (allConnected && ['pending_setup', 'awaiting_integrations'].includes(wf.workflow_status)) {
         newStatus = 'ready'
+
+        // Create notification when all integrations connected
+        if (orderData) {
+          await supabaseAdmin.from('notifications').insert({
+            order_id: orderId,
+            customer_email: orderData.customer_email,
+            type: 'all_integrations_connected',
+            title: 'Alle integrasjoner er koblet til!',
+            message: `Alle integrasjoner for ${wf.automation_name || 'automatiseringen'} er koblet til. Klar til aktivering.`,
+            metadata: { workflow_id: wf.id, automation_name: wf.automation_name }
+          })
+        }
       } else if (!allConnected && wf.workflow_status === 'ready') {
         newStatus = 'awaiting_integrations'
       }
