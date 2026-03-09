@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 interface Notification {
@@ -15,7 +15,7 @@ interface Notification {
   created_at: string
 }
 
-export default function VarslerPage() {
+function VarslerContent() {
   const searchParams = useSearchParams()
   const email = searchParams.get('email') || ''
   const [notifications, setNotifications] = useState<Notification[]>([])
@@ -112,14 +112,11 @@ export default function VarslerPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <div className="max-w-3xl mx-auto px-4 py-8">
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold">Varsler</h1>
             <p className="text-gray-400 text-sm mt-1">
-              {unreadCount > 0
-                ? `${unreadCount} ulest${unreadCount > 1 ? 'e' : ''} varsel`
-                : 'Ingen uleste varsler'}
+              {unreadCount > 0 ? `${unreadCount} ulest${unreadCount > 1 ? 'e' : ''} varsel` : 'Ingen uleste varsler'}
             </p>
           </div>
           {unreadCount > 0 && (
@@ -132,14 +129,11 @@ export default function VarslerPage() {
           )}
         </div>
 
-        {/* Filter */}
         <div className="flex gap-2 mb-6">
           <button
             onClick={() => setFilter('all')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              filter === 'all'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-800 text-gray-400 hover:text-white'
+              filter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
             }`}
           >
             Alle
@@ -147,16 +141,13 @@ export default function VarslerPage() {
           <button
             onClick={() => setFilter('unread')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              filter === 'unread'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-800 text-gray-400 hover:text-white'
+              filter === 'unread' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
             }`}
           >
             Uleste
           </button>
         </div>
 
-        {/* Notifications list */}
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map(i => (
@@ -170,9 +161,7 @@ export default function VarslerPage() {
           <div className="text-center py-16">
             <div className="text-4xl mb-4">🔔</div>
             <p className="text-gray-400">
-              {filter === 'unread'
-                ? 'Ingen uleste varsler'
-                : 'Ingen varsler ennå'}
+              {filter === 'unread' ? 'Ingen uleste varsler' : 'Ingen varsler ennå'}
             </p>
           </div>
         ) : (
@@ -212,5 +201,17 @@ export default function VarslerPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function VarslerPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+        <p className="text-gray-400">Laster varsler...</p>
+      </div>
+    }>
+      <VarslerContent />
+    </Suspense>
   )
 }
