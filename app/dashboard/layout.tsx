@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { gold, goldRgb, bg, fonts } from '@/lib/constants'
 import {
   LayoutDashboard, Phone, Users, CalendarCheck, Settings,
-  Link2, Menu, X, ChevronRight, Zap, Package
+  Link2, Menu, X, ChevronRight, Zap, Package, Bell
 } from 'lucide-react'
 
 const sidebarLinks = [
@@ -18,6 +18,7 @@ const sidebarLinks = [
   { href: '/dashboard/bookinger', label: 'Bookinger', icon: CalendarCheck },
   { href: '/dashboard/integrasjoner', label: 'Integrasjoner', icon: Link2 },
   { href: '/dashboard/innstillinger', label: 'Innstillinger', icon: Settings },
+  { href: '/dashboard/varsler', label: 'Varsler', icon: Bell },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -175,9 +176,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </button>
           <style>{`@media (max-width: 768px) { .show-mob-btn { display: flex !important; } }`}</style>
 
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
           <h2 style={{ color: '#f0f0f0', fontSize: 16, fontWeight: 600, margin: 0 }}>
             {sidebarLinks.find(l => isActive(l.href))?.label || 'Dashboard'}
           </h2>
+          <Link href="/dashboard/varsler" style={{ position: 'relative', color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}>
+            <Bell size={20} />
+          </Link>
+        </div>
         </header>
 
         {/* Page content */}
