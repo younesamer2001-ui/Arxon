@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
         price_data: {
           currency: 'nok',
           product_data: {
-            name: `Arxon AI â ${automations.length} automatisering${automations.length > 1 ? 'er' : ''}`,
+            name: `Arxon AI — ${automations.length} automatisering${automations.length > 1 ? 'er' : ''}`,
             description: monthlyDescription,
           },
           unit_amount: Math.round(effectiveMonthly * 100), // Convert to øre
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
 
     if (orderError) {
       console.error('Supabase order error:', orderError)
-      // Continue even if Supabase fails â Stripe is more critical
+      // Continue even if Supabase fails — Stripe is more critical
     }
 
     // Create Stripe Checkout Session
