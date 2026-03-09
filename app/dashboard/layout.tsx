@@ -9,17 +9,37 @@ import {
   Link2, Menu, X, ChevronRight, Zap, Package, Bell, PiggyBank
 } from 'lucide-react'
 
-const sidebarLinks = [
-  { href: '/dashboard', label: 'Oversikt', icon: LayoutDashboard },
-  { href: '/dashboard/automatiseringer', label: 'Automatiseringer', icon: Zap },
-  { href: '/dashboard/onboarding', label: 'Oppsett', icon: Package },
-  { href: '/dashboard/anrop', label: 'Anrop', icon: Phone },
-  { href: '/dashboard/leads', label: 'Leads', icon: Users },
-  { href: '/dashboard/bookinger', label: 'Bookinger', icon: CalendarCheck },
-  { href: '/dashboard/integrasjoner', label: 'Integrasjoner', icon: Link2 },
-  { href: '/dashboard/innstillinger', label: 'Innstillinger', icon: Settings },
-  { href: '/dashboard/varsler', label: 'Varsler', icon: Bell },
-  { href: '/dashboard/besparelser', label: 'Besparelser', icon: PiggyBank },
+const sidebarSections = [
+  {
+    label: null,
+    links: [
+      { href: '/dashboard', label: 'Oversikt', icon: LayoutDashboard },
+      { href: '/dashboard/besparelser', label: 'Besparelser', icon: PiggyBank },
+    ]
+  },
+  {
+    label: 'Aktivitet',
+    links: [
+      { href: '/dashboard/anrop', label: 'Anrop', icon: Phone },
+      { href: '/dashboard/leads', label: 'Leads', icon: Users },
+      { href: '/dashboard/bookinger', label: 'Bookinger', icon: CalendarCheck },
+    ]
+  },
+  {
+    label: 'System',
+    links: [
+      { href: '/dashboard/automatiseringer', label: 'Automatiseringer', icon: Zap },
+      { href: '/dashboard/integrasjoner', label: 'Integrasjoner', icon: Link2 },
+      { href: '/dashboard/onboarding', label: 'Oppsett', icon: Package },
+    ]
+  },
+  {
+    label: 'Konto',
+    links: [
+      { href: '/dashboard/varsler', label: 'Varsler', icon: Bell },
+      { href: '/dashboard/innstillinger', label: 'Innstillinger', icon: Settings },
+    ]
+  },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -93,35 +113,54 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Nav links */}
-        <nav style={{ flex: 1, padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {sidebarLinks.map(link => {
-            const active = isActive(link.href)
-            const Icon = link.icon
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="dash-link"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '10px 14px',
-                  borderRadius: 8,
-                  textDecoration: 'none',
-                  fontSize: 14,
-                  fontWeight: active ? 600 : 400,
-                  color: active ? gold : 'rgba(255,255,255,0.5)',
-                  background: active ? `rgba(${goldRgb},0.08)` : 'transparent',
-                }}
-              >
-                <Icon size={18} />
-                {link.label}
-                {active && <ChevronRight size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />}
-              </Link>
-            )
-          })}
+        <nav style={{ flex: 1, padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: 2, overflowY: 'auto' }}>
+          {sidebarSections.map((section, sIdx) => (
+            <div key={sIdx} style={{ marginBottom: section.label ? 8 : 0 }}>
+              {section.label && (
+                <div style={{
+                  padding: '16px 14px 6px',
+                  fontSize: 10,
+                  fontWeight: 600,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.35)',
+                  fontFamily: fonts.body
+                }}>
+                  {section.label}
+                </div>
+              )}
+              {section.links.map(link => {
+                const active = isActive(link.href)
+                const Icon = link.icon
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="dash-link"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '10px 14px',
+                      borderRadius: 10,
+                      fontSize: 14,
+                      fontFamily: fonts.body,
+                      color: active ? gold : 'rgba(255,255,255,0.65)',
+                      background: active ? 'rgba(' + goldRgb + ',0.10)' : 'transparent',
+                      fontWeight: active ? 600 : 400,
+                      textDecoration: 'none',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    <Icon size={18} style={{ opacity: active ? 1 : 0.5 }} />
+                    {link.label}
+                    {active && <ChevronRight size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />}
+                  </Link>
+                )
+              })}
+            </div>
+          ))}
         </nav>
 
         {/* User info */}
@@ -179,7 +218,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
           <h2 style={{ color: '#f0f0f0', fontSize: 16, fontWeight: 600, margin: 0 }}>
-            {sidebarLinks.find(l => isActive(l.href))?.label || 'Dashboard'}
+            {sidebarSections.flatMap(s => s.links).find(l => isActive(l.href))?.label || 'Dashboard'}
           </h2>
           <Link href="/dashboard/varsler" style={{ position: 'relative', color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}>
             <Bell size={20} />
