@@ -107,21 +107,22 @@ export async function GET(req: NextRequest) {
       // Estimate based on active automations and months
       for (const key of activeAutomations) {
         const config = SAVINGS_CONFIG[key as keyof typeof SAVINGS_CONFIG]
+        const c = config as any
         const avgMonthly = key === 'phone'
-          ? config.avgCallsPerMonth * (config.costPerCallBefore - (config as any).costPerCallAfter)
+          ? c.avgCallsPerMonth * (c.costPerCallBefore - c.costPerCallAfter)
           : key === 'leads'
-            ? (config as any).avgLeadsPerMonth * ((config as any).costPerLeadBefore - (config as any).costPerLeadAfter)
-            : (config as any).avgBookingsPerMonth * ((config as any).costPerBookingBefore - (config as any).costPerBookingAfter)
+            ? c.avgLeadsPerMonth * (c.costPerLeadBefore - c.costPerLeadAfter)
+            : c.avgBookingsPerMonth * (c.costPerBookingBefore - c.costPerBookingAfter)
 
         const amount = Math.round(avgMonthly * monthsActive)
         totalMoneySaved += amount
         categoryBreakdown.push({ name: config.label, amount, percent: 0 })
 
-        const volume = key === 'phone' ? config.avgCallsPerMonth
-          : key === 'leads' ? (config as any).avgLeadsPerMonth
-          : (config as any).avgBookingsPerMonth
+        const volume = key === 'phone' ? c.avgCallsPerMonth
+          : key === 'leads' ? c.avgLeadsPerMonth
+          : c.avgBookingsPerMonth
         totalCallsHandled += volume * monthsActive
-        totalTimeSavedMinutes += volume * monthsActive * (config as any).timeSavedPerCall || (config as any).timeSavedPerLead || (config as any).timeSavedPerBooking || 5
+        totalTimeSavedMinutes += volume * monthsActive * c.timeSavedPerCall || c.timeSavedPerLead || c.timeSavedPerBooking || 5
       }
 
       // Calculate percentages
