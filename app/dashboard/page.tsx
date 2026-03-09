@@ -397,7 +397,7 @@ export default function DashboardOverview() {
                     </div>
                     {a.uptime !== '\u2014' && (
                       <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, marginTop: 2 }}>
-                        Oppetid: {a.uptime} \u00b7 {a.calls} behandlet
+                        Oppetid: {a.uptime} · {a.calls} behandlet
                       </div>
                     )}
                   </div>
