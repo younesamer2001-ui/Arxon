@@ -11,35 +11,35 @@ import {
 const faqs = [
   {
     q: 'Hvordan fungerer AI-telefonsvarer?',
-    a: 'Arxon sin AI-telefonsvarer svarer automatisk på innkommende anrop til bedriften din. Den kan kvalifisere leads, booke m\u00f8ter, og gi informasjon til kundene dine \u2014 alt basert p\u00e5 instruksjonene du gir den.'
+    a: 'Arxon sin AI-telefonsvarer svarer automatisk på innkommende anrop til bedriften din. Den kan kvalifisere leads, booke møter, og gi informasjon til kundene dine — alt basert på instruksjonene du gir den.'
   },
   {
     q: 'Kan jeg tilpasse hva AI-en sier?',
-    a: 'Ja! Du kan tilpasse hilsen, tone, svar p\u00e5 vanlige sp\u00f8rsm\u00e5l, og n\u00e5r den skal videresende til en ekte person. G\u00e5 til Oppsett-siden for \u00e5 konfigurere dette.'
+    a: 'Ja! Du kan tilpasse hilsen, tone, svar på vanlige spørsmål, og når den skal videresende til en ekte person. Gå til Oppsett-siden for å konfigurere dette.'
   },
   {
-    q: 'Hva skjer n\u00e5r AI-en ikke kan svare?',
-    a: 'Hvis AI-en m\u00f8ter et sp\u00f8rsm\u00e5l den ikke kan h\u00e5ndtere, kan den enten ta en beskjed, videresende til ditt mobilnummer, eller sende en varsel via e-post/SMS.'
+    q: 'Hva skjer når AI-en ikke kan svare?',
+    a: 'Hvis AI-en møter et spørsmål den ikke kan håndtere, kan den enten ta en beskjed, videresende til ditt mobilnummer, eller sende en varsel via e-post/SMS.'
   },
   {
     q: 'Hvordan ser jeg samtalehistorikken?',
-    a: 'G\u00e5 til Anrop-siden i dashboardet. Der finner du full samtalelogg med transkripsjoner, utfall-tags, og AI-oppsummering av hvert anrop.'
+    a: 'Gå til Anrop-siden i dashboardet. Der finner du full samtalelogg med transkripsjoner, utfall-tags, og AI-oppsummering av hvert anrop.'
   },
   {
     q: 'Kan jeg integrere med mitt CRM?',
-    a: 'Ja, Arxon st\u00f8tter integrasjon med flere CRM-systemer via n8n-automatisering. G\u00e5 til Integrasjoner for \u00e5 sette opp tilkoblinger.'
+    a: 'Ja, Arxon støtter integrasjon med flere CRM-systemer via n8n-automatisering. Gå til Integrasjoner for å sette opp tilkoblinger.'
   },
   {
     q: 'Hva koster tjenesten?',
-    a: 'Se v\u00e5r prisside p\u00e5 arxon.no for oppdaterte priser. Du kan ogs\u00e5 se din besparelse i Besparelser-dashboardet.'
+    a: 'Se vår prisside på arxon.no for oppdaterte priser. Du kan også se din besparelse i Besparelser-dashboardet.'
   },
 ]
 
 const guides = [
-  { icon: Zap, title: 'Kom i gang', desc: 'Sett opp AI-telefonsvarer p\u00e5 5 minutter', link: '#' },
+  { icon: Zap, title: 'Kom i gang', desc: 'Sett opp AI-telefonsvarer på 5 minutter', link: '#' },
   { icon: Phone, title: 'Tilpass telefonsvarer', desc: 'Konfigurer hilsen, svar og videresending', link: '#' },
-  { icon: Users, title: 'Lead-h\u00e5ndtering', desc: 'Forst\u00e5 hvordan leads fanges og kategoriseres', link: '#' },
-  { icon: Shield, title: 'Sikkerhet og personvern', desc: 'GDPR-compliance og datah\u00e5ndtering', link: '#' },
+  { icon: Users, title: 'Lead-håndtering', desc: 'Forstå hvordan leads fanges og kategoriseres', link: '#' },
+  { icon: Shield, title: 'Sikkerhet og personvern', desc: 'GDPR-compliance og datahåndtering', link: '#' },
 ]
 
 export default function SupportPage() {
@@ -60,7 +60,7 @@ export default function SupportPage() {
         Hjelp & Support
       </h1>
       <p style={{ color: '#999', marginBottom: 32, fontSize: 15 }}>
-        Finn svar, l\u00e6r mer om Arxon, eller ta kontakt med oss.
+        Finn svar, lær mer om Arxon, eller ta kontakt med oss.
       </p>
 
       {/* Quick help cards */}
@@ -141,7 +141,7 @@ export default function SupportPage() {
 
       {/* FAQ */}
       <h2 style={{ fontFamily: fonts.heading, fontSize: 20, fontWeight: 600, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-        <HelpCircle size={20} color={gold} /> Vanlige sp\u00f8rsm\u00e5l
+        <HelpCircle size={20} color={gold} /> Vanlige spørsmål
       </h2>
       <div style={{ marginBottom: 40 }}>
         {faqs.map((faq, i) => (
@@ -227,7 +227,7 @@ export default function SupportPage() {
         }} />
         <div>
           <div style={{ fontWeight: 600, fontSize: 14 }}>Alle systemer operative</div>
-          <div style={{ color: '#999', fontSize: 12 }}>AI-telefonsvarer, booking og lead-kvalifisering kj\u00f8rer normalt.</div>
+          <div style={{ color: '#999', fontSize: 12 }}>AI-telefonsvarer, booking og lead-kvalifisering kjører normalt.</div>
         </div>
       </div>
     </div>
