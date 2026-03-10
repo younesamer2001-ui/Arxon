@@ -10,9 +10,9 @@ const supabase = createClient(
 const SAVINGS_CONFIG = {
   phone: {
     costPerCallBefore: 17.5,  // NOK per manual call handling
-    costPerCallAfter: 2.0,    // NOK per AI call
+    costPerCallAfter: 2.0,   // NOK per AI call
     avgCallsPerMonth: 500,
-    timeSavedPerCall: 5,      // minutes
+    timeSavedPerCall: 5,     // minutes
     label: 'Telefonhåndtering',
   },
   leads: {
@@ -34,6 +34,7 @@ const SAVINGS_CONFIG = {
 export async function GET(req: NextRequest) {
   try {
     const customerId = req.nextUrl.searchParams.get('customer_id')
+
     if (!customerId) {
       return NextResponse.json({ error: 'customer_id required' }, { status: 400 })
     }
@@ -75,21 +76,26 @@ export async function GET(req: NextRequest) {
     if (integrations?.make_connected || integrations?.cal_connected) activeAutomations.push('leads')
     if (integrations?.cal_connected) activeAutomations.push('booking')
 
+    // If no integrations found but we have phone_call activities, assume phone is active
+    if (activeAutomations.length === 0 && activities && activities.some((a: any) => a.type === 'phone_call')) {
+      activeAutomations.push('phone')
+    }
+
     // Calculate savings from real activities or estimates
     let totalMoneySaved = 0
     let totalTimeSavedMinutes = 0
     let totalCallsHandled = 0
     const categoryBreakdown: Array<{
-      name: string
-      amount: number
-      percent: number
+      category: string
+      saved: number
+      label: string
     }> = []
 
     if (activities && activities.length > 0) {
       // Use real activity data
-      const phoneCalls = activities.filter(a => a.type === 'phone_call').length
-      const leadsProcessed = activities.filter(a => a.type === 'lead_qualified').length
-      const bookingsMade = activities.filter(a => a.type === 'booking_created').length
+      const phoneCalls = activities.filter((a: any) => a.type === 'phone_call').length
+      const leadsProcessed = activities.filter((a: any) => a.type === 'lead_qualified').length
+      const bookingsMade = activities.filter((a: any) => a.type === 'booking_created').length
 
       const phoneSavings = phoneCalls * (SAVINGS_CONFIG.phone.costPerCallBefore - SAVINGS_CONFIG.phone.costPerCallAfter)
       const leadSavings = leadsProcessed * (SAVINGS_CONFIG.leads.costPerLeadBefore - SAVINGS_CONFIG.leads.costPerLeadAfter)
@@ -99,10 +105,21 @@ export async function GET(req: NextRequest) {
       totalTimeSavedMinutes = (phoneCalls * 5) + (leadsProcessed * 15) + (bookingsMade * 10)
       totalCallsHandled = phoneCalls + leadsProcessed + bookingsMade
 
-      const total = totalMoneySaved || 1
-      if (phoneSavings > 0) categoryBreakdown.push({ name: 'Telefonhåndtering', amount: Math.round(phoneSavings), percent: Math.round((phoneSavings / total) * 100) })
-      if (leadSavings > 0) categoryBreakdown.push({ name: 'Lead-kvalifisering', amount: Math.round(leadSavings), percent: Math.round((leadSavings / total) * 100) })
-      if (bookingSavings > 0) categoryBreakdown.push({ name: 'Booking-automatisering', amount: Math.round(bookingSavings), percent: Math.round((bookingSavings / total) * 100) })
+      if (phoneSavings > 0) categoryBreakdown.push({
+        category: 'phone',
+        saved: Math.round(phoneSavings),
+        label: 'Telefonhåndtering'
+      })
+      if (leadSavings > 0) categoryBreakdown.push({
+        category: 'leads',
+        saved: Math.round(leadSavings),
+        label: 'Lead-kvalifisering'
+      })
+      if (bookingSavings > 0) categoryBreakdown.push({
+        category: 'booking',
+        saved: Math.round(bookingSavings),
+        label: 'Booking-automatisering'
+      })
     } else {
       // Estimate based on active automations and months
       for (const key of activeAutomations) {
@@ -111,30 +128,29 @@ export async function GET(req: NextRequest) {
         const avgMonthly = key === 'phone'
           ? c.avgCallsPerMonth * (c.costPerCallBefore - c.costPerCallAfter)
           : key === 'leads'
-            ? c.avgLeadsPerMonth * (c.costPerLeadBefore - c.costPerLeadAfter)
-            : c.avgBookingsPerMonth * (c.costPerBookingBefore - c.costPerBookingAfter)
+          ? c.avgLeadsPerMonth * (c.costPerLeadBefore - c.costPerLeadAfter)
+          : c.avgBookingsPerMonth * (c.costPerBookingBefore - c.costPerBookingAfter)
 
         const amount = Math.round(avgMonthly * monthsActive)
         totalMoneySaved += amount
-        categoryBreakdown.push({ name: config.label, amount, percent: 0 })
+        categoryBreakdown.push({
+          category: key,
+          saved: amount,
+          label: config.label
+        })
 
         const volume = key === 'phone' ? c.avgCallsPerMonth
           : key === 'leads' ? c.avgLeadsPerMonth
           : c.avgBookingsPerMonth
         totalCallsHandled += volume * monthsActive
-        totalTimeSavedMinutes += volume * monthsActive * c.timeSavedPerCall || c.timeSavedPerLead || c.timeSavedPerBooking || 5
+        totalTimeSavedMinutes += volume * monthsActive * (c.timeSavedPerCall || c.timeSavedPerLead || c.timeSavedPerBooking || 5)
       }
-
-      // Calculate percentages
-      const total = totalMoneySaved || 1
-      categoryBreakdown.forEach(c => {
-        c.percent = Math.round((c.amount / total) * 100)
-      })
     }
 
     // Generate monthly data (last 6 months)
     const monthlyData = []
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Des']
+
     for (let i = 5; i >= 0; i--) {
       const d = new Date()
       d.setMonth(d.getMonth() - i)
@@ -151,7 +167,7 @@ export async function GET(req: NextRequest) {
     }
 
     const timeSavedHours = Math.round(totalTimeSavedMinutes / 60)
-    const investmentPerMonth = 2990 // Arxon subscription cost
+    const investmentPerMonth = 2990  // Arxon subscription cost
     const totalInvestment = investmentPerMonth * monthsActive
     const roi = totalInvestment > 0 ? Math.round((totalMoneySaved / totalInvestment) * 100) : 0
 
@@ -165,14 +181,14 @@ export async function GET(req: NextRequest) {
       categoryBreakdown,
       monthlyData,
       beforeAfter: [
-        { label: 'Kostnad per samtale', before: '17,50 kr', after: '2,00 kr', savings: '89%' },
-        { label: 'Tid per samtale', before: '5 min', after: '0 min', savings: '100%' },
-        { label: 'Tapte anrop', before: '35%', after: '0%', savings: '100%' },
-        { label: 'Responstid', before: '2-4 timer', after: 'Umiddelbart', savings: String.fromCharCode(8734) },
+        { label: 'Kostnad per samtale', before: 17.5, after: 2.0, unit: 'kr' },
+        { label: 'Kostnad per lead', before: 85, after: 12, unit: 'kr' },
+        { label: 'Kostnad per booking', before: 45, after: 5, unit: 'kr' },
       ],
       isEstimate: !activities || activities.length === 0,
       orderDate: order.created_at,
     })
+
   } catch (error: any) {
     console.error('Savings API error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
