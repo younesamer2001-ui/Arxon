@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Star, Quote } from 'lucide-react'
+import { Star, Quote, TrendingUp, Zap, Shield, Clock } from 'lucide-react'
 import { gold, goldRgb } from '@/lib/constants'
 import { useLanguage } from '@/lib/language-context'
 import { AnimCounter } from './AnimCounter'
@@ -13,18 +13,61 @@ const sAnim = {
   transition: { duration: 0.5 },
 }
 
-const staggerContainer = {
-  initial: {},
-  whileInView: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
-  viewport: { once: true },
-}
-
-const staggerChild = {
-  initial: { opacity: 0, y: 24 },
-  whileInView: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-}
-
 const avatarColors = ['#efc07b', '#4ade80', '#60a5fa', '#f472b6']
+const statIcons = [TrendingUp, Shield, Zap, Clock]
+
+function TestimonialCard({ t, i }: { t: { name: string; biz: string; quote: string; result: string; stars: number }; i: number }) {
+  return (
+    <div
+      className="relative group rounded-2xl overflow-hidden flex-shrink-0 w-[320px] md:w-[380px]"
+      style={{
+        background: 'rgba(13, 26, 45, 0.5)',
+        border: `1px solid rgba(${goldRgb},0.08)`,
+        backdropFilter: 'blur(10px)',
+      }}
+    >
+      {/* Gold left border accent */}
+      <div className="absolute left-0 top-0 bottom-0 w-[2px]"
+        style={{ background: `linear-gradient(180deg, ${gold}, rgba(${goldRgb},0.08))` }} />
+
+      <div className="relative z-10 p-6 pl-7">
+        {/* Quote icon + stars */}
+        <div className="flex items-center justify-between mb-4">
+          <Quote size={18} style={{ color: `rgba(${goldRgb},0.25)` }} />
+          <div className="flex gap-0.5">
+            {Array.from({ length: t.stars }).map((_, j) => <Star key={j} size={11} fill={gold} color={gold} />)}
+          </div>
+        </div>
+
+        <p className="text-[13px] leading-relaxed mb-5 italic" style={{ color: 'rgba(244,241,235,0.65)' }}>
+          &ldquo;{t.quote}&rdquo;
+        </p>
+
+        {/* Result badge */}
+        <div className="mb-4">
+          <span className="text-[13px] font-bold px-3.5 py-1.5 rounded-full"
+            style={{ background: 'rgba(74,222,128,0.08)', color: '#4ade80', border: '1px solid rgba(74,222,128,0.15)' }}>
+            {t.result}
+          </span>
+        </div>
+
+        {/* Divider */}
+        <div className="h-px mb-4" style={{ background: 'rgba(244,241,235,0.05)' }} />
+
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-[13px] font-bold"
+            style={{ background: `${avatarColors[i % 4]}15`, border: `1.5px solid ${avatarColors[i % 4]}40`, color: avatarColors[i % 4] }}>
+            {t.name.charAt(0)}
+          </div>
+          <div>
+            <div className="text-[13px] font-semibold" style={{ color: '#f4f1eb' }}>{t.name}</div>
+            <div className="text-[11px]" style={{ color: 'rgba(244,241,235,0.45)' }}>{t.biz}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function AuthoritySection() {
   const { lang } = useLanguage()
@@ -55,90 +98,95 @@ export function AuthoritySection() {
   ]
 
   return (
-    <section className="py-14 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
-      <div className="max-w-4xl mx-auto px-5">
-        {/* Stats in cards */}
-        <motion.div {...sAnim} className="mb-12 md:mb-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            {stats.map((s, i) => (
-              <motion.div key={i} initial={{ opacity: 0, scale: 0.8, y: 12 }} whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08, type: 'spring', stiffness: 150, damping: 15 }}
-                className="text-center py-5 px-3 rounded-xl"
-                style={{
-                  background: 'rgba(13, 26, 45, 0.4)',
-                  border: `1px solid rgba(${goldRgb},0.1)`,
-                  backdropFilter: 'blur(8px)',
-                }}>
-                <div className="text-[26px] md:text-[34px] font-extrabold text-gradient-gold">
-                  <AnimCounter target={s.val} suffix={s.suffix} />
-                </div>
-                <div className="text-[11px] tracking-wider uppercase mt-1" style={{ color: 'rgba(244,241,235,0.5)' }}>{s.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+    <section className="relative py-16 md:py-32 overflow-hidden" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
+      {/* Marquee keyframes */}
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .marquee-track {
+          animation: marquee 35s linear infinite;
+        }
+        .marquee-track:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
 
-        <motion.div {...sAnim} className="text-center mb-10 md:mb-12">
-          <h2 className="text-[24px] md:text-[36px] font-bold tracking-tight" style={{ color: '#f4f1eb' }}>
+      {/* Gold ambient glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] pointer-events-none"
+        style={{ background: `radial-gradient(ellipse, rgba(${goldRgb},0.04), transparent 70%)`, filter: 'blur(60px)' }} />
+
+      <div className="relative max-w-5xl mx-auto px-5">
+        {/* Section heading */}
+        <motion.div {...sAnim} className="text-center mb-12 md:mb-16">
+          <p className="text-[12px] uppercase tracking-[0.2em] mb-3 font-medium" style={{ color: gold }}>
+            {no ? 'Resultater som teller' : 'Results that matter'}
+          </p>
+          <h2 className="text-[28px] md:text-[44px] font-bold tracking-tight" style={{ color: '#f4f1eb' }}>
             {no ? 'Det fungerer for' : 'It works for'} <span className="text-gradient-gold">{no ? 'andre' : 'others'}</span>
           </h2>
         </motion.div>
 
-        <motion.div className="grid md:grid-cols-2 gap-5" {...staggerContainer}>
-          {testimonials.map((t, i) => (
-            <motion.div key={i}
-              variants={staggerChild}
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className={`relative group rounded-xl overflow-hidden${i >= 2 ? ' hidden md:block' : ''}`}
-              style={{
-                background: 'rgba(13, 26, 45, 0.4)',
-                border: '1px solid rgba(244, 241, 235, 0.06)',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              {/* Gold left border accent */}
-              <div className="absolute left-0 top-0 bottom-0 w-[3px]"
-                style={{ background: `linear-gradient(180deg, ${gold}, rgba(${goldRgb},0.15))` }} />
+        {/* Stats row with icons */}
+        <motion.div {...sAnim} className="mb-14 md:mb-20">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
+            {stats.map((s, i) => {
+              const Icon = statIcons[i]
+              return (
+                <motion.div key={i}
+                  initial={{ opacity: 0, scale: 0.85, y: 16 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.08, type: 'spring', stiffness: 150, damping: 15 }}
+                  whileHover={{ y: -3, scale: 1.02, transition: { duration: 0.2 } }}
+                  className="relative group text-center py-6 px-4 rounded-2xl overflow-hidden cursor-default"
+                  style={{
+                    background: 'rgba(13, 26, 45, 0.5)',
+                    border: `1px solid rgba(${goldRgb},0.1)`,
+                    backdropFilter: 'blur(10px)',
+                  }}
+                >
+                  {/* Top gold line */}
+                  <div className="absolute top-0 left-[20%] right-[20%] h-[2px] opacity-60 group-hover:opacity-100 transition-opacity"
+                    style={{ background: `linear-gradient(90deg, transparent, ${gold}, transparent)` }} />
 
-              {/* Hover glow */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                style={{ background: `radial-gradient(circle at 0% 0%, rgba(${goldRgb},0.06), transparent 60%)` }} />
-
-              <div className="relative z-10 p-6 md:p-7 pl-7 md:pl-8">
-                {/* Quote icon + stars */}
-                <div className="flex items-center justify-between mb-4">
-                  <Quote size={20} style={{ color: `rgba(${goldRgb},0.25)` }} />
-                  <div className="flex gap-0.5">
-                    {Array.from({ length: t.stars }).map((_, j) => <Star key={j} size={12} fill={gold} color={gold} />)}
+                  <div className="flex justify-center mb-2">
+                    <Icon size={18} style={{ color: `rgba(${goldRgb},0.5)` }} />
                   </div>
-                </div>
-
-                <p className="text-[14px] leading-relaxed mb-6 italic" style={{ color: 'rgba(244,241,235,0.65)' }}>
-                  &ldquo;{t.quote}&rdquo;
-                </p>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    {/* Avatar circle */}
-                    <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-[13px] font-bold"
-                      style={{ background: `${avatarColors[i]}15`, border: `1.5px solid ${avatarColors[i]}40`, color: avatarColors[i] }}>
-                      {t.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="text-[13px] font-semibold" style={{ color: '#f4f1eb' }}>{t.name}</div>
-                      <div className="text-[11px]" style={{ color: 'rgba(244,241,235,0.5)' }}>{t.biz}</div>
-                    </div>
+                  <div className="text-[28px] md:text-[38px] font-extrabold text-gradient-gold leading-none">
+                    <AnimCounter target={s.val} suffix={s.suffix} />
                   </div>
-                  <span className="text-[12px] font-bold px-3.5 py-1.5 rounded-full"
-                    style={{ background: 'rgba(74,222,128,0.1)', color: '#4ade80', border: '1px solid rgba(74,222,128,0.2)' }}>
-                    {t.result}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+                  <div className="text-[11px] tracking-wider uppercase mt-2 font-medium" style={{ color: 'rgba(244,241,235,0.45)' }}>{s.label}</div>
+                </motion.div>
+              )
+            })}
+          </div>
         </motion.div>
       </div>
+
+      {/* Testimonials marquee — full width, breaks out of container */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        className="relative"
+      >
+        {/* Left fade */}
+        <div className="absolute left-0 top-0 bottom-0 w-20 md:w-32 z-10 pointer-events-none"
+          style={{ background: 'linear-gradient(90deg, #050510, transparent)' }} />
+        {/* Right fade */}
+        <div className="absolute right-0 top-0 bottom-0 w-20 md:w-32 z-10 pointer-events-none"
+          style={{ background: 'linear-gradient(270deg, #050510, transparent)' }} />
+
+        <div className="marquee-track flex gap-5" style={{ width: 'max-content' }}>
+          {/* Duplicate testimonials for seamless loop */}
+          {[...testimonials, ...testimonials].map((t, i) => (
+            <TestimonialCard key={i} t={t} i={i} />
+          ))}
+        </div>
+      </motion.div>
     </section>
   )
 }
