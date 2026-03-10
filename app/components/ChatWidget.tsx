@@ -26,18 +26,9 @@ const LABELS = {
   thinking: 'Eirik tenker...', // New state to mask latency
   listening: 'Lytter...',
   error: 'Noe gikk galt — prøv igjen',
-  inputActive: 'Skriv til Eirik...',
-  inputIdle: 'Skriv en melding...',
 } as const
 
 type StatusKey = keyof typeof LABELS | ''
-
-const SUGGESTIONS = [
-  { emoji: '💰', label: 'Hva koster det?' , msg: 'Hva koster Arxon sine tjenester?' },
-  { emoji: '📦', label: 'Hvilken pakke?',   msg: 'Jeg vil finne ut hvilken pakke som passer for min bedrift.' },
-  { emoji: '⚡', label: 'Hvordan fungerer det?', msg: 'Kan du forklare hvordan Arxon fungerer i praksis?' },
-  { emoji: '📅', label: 'Book samtale',        msg: 'Jeg vil gjerne booke en uforpliktende samtale med dere.' },
-]
 
 /* ─────────────────────────────────────────────────────────────────────────────
    2. MAIN COMPONENT
@@ -48,7 +39,6 @@ export default function ChatWidget() {
 
   // --- UI State ---
   const [open, setOpen] = useState(false)
-  const [inputValue, setInputValue] = useState('')
   
   // --- Vapi & Call State ---
   const [isCallActive, setIsCallActive] = useState(false)
@@ -56,13 +46,11 @@ export default function ChatWidget() {
   const [statusKey, setStatusKey] = useState<StatusKey>('')
   const [volumeLevel, setVolumeLevel] = useState(0)
   
-  // --- Transcripts (New Feature) ---
+  // --- Transcripts ---
   const [userTranscript, setUserTranscript] = useState('')
   const [assistantTranscript, setAssistantTranscript] = useState('')
 
   const vapiRef = useRef<any>(null)
-  const pendingMessageRef = useRef<string | null>(null)
-  const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   /* ─── Initialize Vapi ─── */
   useEffect(() => {
@@ -84,16 +72,6 @@ export default function ChatWidget() {
           setStatusKey('connected')
           setUserTranscript('')
           setAssistantTranscript('')
-
-          if (pendingMessageRef.current) {
-            const msg = pendingMessageRef.current
-            pendingMessageRef.current = null
-            pendingTimerRef.current = setTimeout(() => {
-              pendingTimerRef.current = null
-              vapiInstance.send({ type: 'add-message', message: { role: 'user', content: msg } })
-              setUserTranscript(msg)
-            }, 2000) // Slightly faster response time
-          }
         })
 
         vapiInstance.on('call-end', () => {
@@ -101,11 +79,6 @@ export default function ChatWidget() {
           setIsConnecting(false)
           setStatusKey('')
           setVolumeLevel(0)
-          if (pendingTimerRef.current) { 
-            clearTimeout(pendingTimerRef.current)
-            pendingTimerRef.current = null 
-          }
-          pendingMessageRef.current = null
         })
 
         vapiInstance.on('speech-start', () => { 
@@ -167,38 +140,6 @@ export default function ChatWidget() {
       }
     }
   }, [isCallActive, assistantId])
-
-  const startWithTopic = useCallback((msg: string) => {
-    if (!vapiRef.current || !assistantId) return
-    pendingMessageRef.current = msg
-    setIsConnecting(true)
-    setStatusKey('connecting')
-    setUserTranscript(msg) // Show what we are sending immediately
-
-    vapiRef.current.start(assistantId, {
-      assistantOverrides: {
-        firstMessageMode: 'assistant-speaks-first-with-model-generated-message' as any,
-        model: { messages: [{ role: 'user' as const, content: msg }] },
-      },
-    } as any).catch(() => {
-      pendingMessageRef.current = null
-      setIsConnecting(false)
-      setStatusKey('')
-    })
-  }, [assistantId])
-
-  const sendMessage = useCallback(() => {
-    if (!inputValue.trim() || !vapiRef.current) return
-    const text = inputValue.trim()
-    setInputValue('')
-    
-    if (isCallActive) {
-      vapiRef.current.send({ type: 'add-message', message: { role: 'user', content: text } })
-      setUserTranscript(text)
-    } else {
-      startWithTopic(text)
-    }
-  }, [inputValue, isCallActive, startWithTopic])
 
   const handleClose = useCallback(() => {
     if (isCallActive) vapiRef.current?.stop()
@@ -318,47 +259,6 @@ export default function ChatWidget() {
             )}
           </div>
 
-          {/* suggestion chips */}
-          {!isActive && (
-            <div className="eirik-suggestions">
-              {SUGGESTIONS.map((s, i) => (
-                <button key={i} onClick={() => startWithTopic(s.msg)} className="eirik-chip">
-                  <span style={{ fontSize: 13 }}>{s.emoji}</span>
-                  <span>{s.label}</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* text input */}
-          <div className="eirik-input-wrap">
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') sendMessage() }}
-              placeholder={isCallActive ? LABELS.inputActive : LABELS.inputIdle}
-              className="eirik-input"
-            />
-            <button
-              onClick={sendMessage}
-              disabled={!inputValue.trim()}
-              aria-label="Send"
-              className="eirik-send"
-              style={{
-                background: inputValue.trim() ? COLORS.gold : 'transparent',
-                opacity: inputValue.trim() ? 1 : 0.4,
-              }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke={inputValue.trim() ? '#0a0a0f' : COLORS.textMuted}
-                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13" />
-                <polygon points="22 2 15 22 11 13 2 9 22 2" />
-              </svg>
-            </button>
-          </div>
-
           {/* footer */}
           <div className="eirik-footer">
             Eirik bruker mikrofon for samtale. Ingen data lagres.
@@ -455,38 +355,6 @@ export default function ChatWidget() {
         }
         .eirik-end-call:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); }
 
-        .eirik-suggestions {
-          padding: 0 16px 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
-        }
-        .eirik-chip {
-          display: flex; align-items: center; gap: 6px; padding: 9px 10px;
-          background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.06);
-          border-radius: 10px; color: ${COLORS.textPrimary}; font-size: 11.5px;
-          cursor: pointer; transition: all 0.15s; font-family: inherit; text-align: left; line-height: 1.3;
-        }
-        .eirik-chip:hover {
-          background: rgba(${COLORS.goldRgb},0.06); border-color: rgba(${COLORS.goldRgb},0.15);
-          transform: translateY(-1px);
-        }
-
-        .eirik-input-wrap {
-          padding: 8px 16px 12px; display: flex; align-items: center; gap: 6px;
-          background: rgba(255,255,255,0.015); border-top: 1px solid rgba(255,255,255,0.04);
-        }
-        .eirik-input {
-          flex: 1; background: ${COLORS.surface}; border: 1px solid rgba(255,255,255,0.06);
-          border-radius: 20px; outline: none; color: ${COLORS.textPrimary}; font-size: 13px;
-          padding: 9px 14px; font-family: inherit; transition: border-color 0.15s;
-        }
-        .eirik-input:focus { border-color: rgba(${COLORS.goldRgb},0.2); }
-        .eirik-input::placeholder { color: ${COLORS.textMuted}; }
-        
-        .eirik-send {
-          width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
-          display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0;
-        }
-        .eirik-send:hover { transform: scale(1.05); }
-
         .eirik-footer {
           padding: 0 16px 10px; text-align: center; font-size: 9.5px; color: rgba(255,255,255,0.16); line-height: 1.4;
         }
@@ -505,11 +373,10 @@ export default function ChatWidget() {
         @media (max-width: 480px) {
           .eirik-panel { bottom: 12px !important; right: 12px !important; width: calc(100vw - 24px) !important; max-width: 340px !important; border-radius: 18px !important; }
           .eirik-trigger { bottom: 16px !important; right: 16px !important; }
-          .eirik-suggestions { grid-template-columns: 1fr !important; }
         }
         @media (prefers-reduced-motion: reduce) {
           .eirik-trigger-ring, .eirik-panel, .eirik-status-dot, .eirik-transcripts { animation: none !important; }
-          .eirik-trigger:hover, .eirik-chip:hover, .eirik-send:hover { transform: none; }
+          .eirik-trigger:hover { transform: none; }
         }
       `}</style>
     </>
