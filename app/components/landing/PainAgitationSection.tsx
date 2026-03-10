@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { PhoneOff, Clock, TrendingUp } from 'lucide-react'
-import { gold } from '@/lib/constants'
+import { gold, goldRgb } from '@/lib/constants'
 import { useLanguage } from '@/lib/language-context'
 
 const sAnim = {
@@ -28,9 +28,9 @@ export function PainAgitationSection() {
   const no = lang === 'no'
 
   return (
-    <section className="py-20 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
+    <section className="py-14 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
       <div className="max-w-4xl mx-auto px-5">
-        <motion.div {...sAnim} className="text-center mb-14">
+        <motion.div {...sAnim} className="text-center mb-10 md:mb-14">
           <h2 className="text-[28px] md:text-[42px] font-bold tracking-tight mb-4" style={{ color: '#f4f1eb' }}>
             {no ? 'Kjenner du deg igjen?' : 'Sound familiar?'}
           </h2>

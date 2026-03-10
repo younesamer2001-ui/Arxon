@@ -18,9 +18,9 @@ export function BentoGridSection() {
   const no = lang === 'no'
 
   return (
-    <section className="py-20 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
+    <section className="py-14 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
       <div className="max-w-5xl mx-auto px-5">
-        <motion.div {...sAnim} className="text-center mb-14">
+        <motion.div {...sAnim} className="text-center mb-10 md:mb-14">
           <h2 className="text-[28px] md:text-[42px] font-bold tracking-tight mb-4" style={{ color: '#f4f1eb' }}>
             {no ? 'Alt du trenger —' : 'Everything you need —'} <span className="text-gradient-gold">{no ? 'én plattform' : 'one platform'}</span>
           </h2>

@@ -19,9 +19,9 @@ export function ProductDemoSection() {
   const no = lang === 'no'
 
   return (
-    <section className="py-20 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
+    <section className="py-14 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
       <div className="max-w-5xl mx-auto px-5">
-        <motion.div {...sAnim} className="text-center mb-14">
+        <motion.div {...sAnim} className="text-center mb-10 md:mb-14">
           <h2 className="text-[28px] md:text-[42px] font-bold tracking-tight mb-4" style={{ color: '#f4f1eb' }}>
             {no ? 'Se det i' : 'See it in'} <span className="text-gradient-gold">{no ? 'aksjon' : 'action'}</span>
           </h2>
@@ -41,7 +41,7 @@ export function ProductDemoSection() {
             <PhoneDemo />
           </motion.div>
 
-          <motion.div {...sAnim}>
+          <motion.div {...sAnim} className="hidden md:block">
             <div className="text-center mb-4">
               <span className="inline-flex items-center gap-1.5 text-[12px] font-medium px-3 py-1 rounded-full"
                 style={{ background: `rgba(${goldRgb},0.08)`, color: gold, border: `1px solid rgba(${goldRgb},0.15)` }}>

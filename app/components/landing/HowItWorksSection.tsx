@@ -37,9 +37,9 @@ export function HowItWorksSection() {
   }, [router])
 
   return (
-    <section className="py-20 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
+    <section className="py-14 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
       <div className="max-w-2xl mx-auto px-5">
-        <motion.div {...sAnim} className="text-center mb-16">
+        <motion.div {...sAnim} className="text-center mb-10 md:mb-16">
           <h2 className="text-[28px] md:text-[42px] font-bold tracking-tight mb-4" style={{ color: '#f4f1eb' }}>
             {no ? 'Tre steg til' : 'Three steps to'} <span className="text-gradient-gold">{no ? 'full automatisering' : 'full automation'}</span>
           </h2>

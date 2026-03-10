@@ -29,9 +29,9 @@ export function AuthoritySection() {
   const no = lang === 'no'
 
   return (
-    <section className="py-20 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
+    <section className="py-14 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
       <div className="max-w-4xl mx-auto px-5">
-        <motion.div {...sAnim} className="text-center mb-16">
+        <motion.div {...sAnim} className="text-center mb-10 md:mb-16">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-14">
             {(no ? [
               { val: 200, suffix: '+', label: 'Automatiseringer' },
@@ -76,7 +76,7 @@ export function AuthoritySection() {
             <motion.div key={i}
               variants={staggerChild}
               whileHover={{ y: -3, transition: { duration: 0.2 } }}
-              className="glass-card p-6 md:p-8">
+              className={`glass-card p-6 md:p-8${i >= 2 ? ' hidden md:block' : ''}`}>
               <div className="flex gap-1 mb-4">
                 {Array.from({ length: t.stars }).map((_, j) => <Star key={j} size={14} fill={gold} color={gold} />)}
               </div>

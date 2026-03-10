@@ -460,6 +460,36 @@ export default function Home() {
           transition: width 0.4s ease;
         }
 
+        /* ── Mobile-first overrides ── */
+        @media (max-width: 767px) {
+          .bento-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+
+          .bento-card .relative.z-10 {
+            padding: 16px 18px;
+          }
+
+          .glass-card {
+            border-radius: 10px;
+          }
+
+          .demo-phone-frame {
+            max-width: 260px;
+            border-radius: 30px;
+          }
+
+          .demo-workflow-frame {
+            padding: 14px;
+          }
+
+          .cta-glow {
+            width: 300px;
+            height: 300px;
+          }
+        }
+
         /* ── Accessibility ── */
         @media (prefers-reduced-motion: reduce) {
           .gold-btn::after { transition: none; }

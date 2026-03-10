@@ -43,7 +43,7 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
   }, [openBooking])
 
   return (
-    <section ref={heroRef} className="relative overflow-hidden min-h-[100vh] flex items-center justify-center" style={{ background: '#050510' }}>
+    <section ref={heroRef} className="relative overflow-hidden min-h-[100svh] flex items-center justify-center" style={{ background: '#050510' }}>
       {/* Subtle background glow */}
       <div className="absolute inset-0" style={{
         background: `radial-gradient(ellipse 50% 40% at 50% 45%, rgba(${goldRgb},0.035) 0%, transparent 70%)`,

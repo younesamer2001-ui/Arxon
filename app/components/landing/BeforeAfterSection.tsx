@@ -28,10 +28,10 @@ export function BeforeAfterSection() {
   const no = lang === 'no'
 
   return (
-    <section className="py-20 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
+    <section className="py-14 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
       <div className="max-w-4xl mx-auto px-5">
-        <motion.div {...sAnim} className="text-center mb-14">
-          <h2 className="text-[28px] md:text-[42px] font-bold tracking-tight mb-4" style={{ color: '#f4f1eb' }}>
+        <motion.div {...sAnim} className="text-center mb-8 md:mb-14">
+          <h2 className="text-[24px] md:text-[42px] font-bold tracking-tight mb-4" style={{ color: '#f4f1eb' }}>
             {no ? 'Før og etter' : 'Before and after'} <span className="text-gradient-gold">Arxon</span>
           </h2>
         </motion.div>
@@ -59,7 +59,7 @@ export function BeforeAfterSection() {
                 'Invoicing takes hours every week',
                 'No overview of lost opportunities',
               ]).map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
+                <div key={i} className={`flex items-start gap-3${i >= 4 ? ' hidden md:flex' : ''}`}>
                   <X size={14} className="mt-0.5 flex-shrink-0" style={{ color: 'rgba(239,69,69,0.6)' }} />
                   <span className="text-[13px] leading-relaxed" style={{ color: 'rgba(244,241,235,0.6)' }}>{item}</span>
                 </div>
@@ -89,7 +89,7 @@ export function BeforeAfterSection() {
                 'Invoicing sent automatically',
                 'Full overview of ROI and results',
               ]).map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
+                <div key={i} className={`flex items-start gap-3${i >= 4 ? ' hidden md:flex' : ''}`}>
                   <Check size={14} className="mt-0.5 flex-shrink-0" style={{ color: '#4ade80' }} />
                   <span className="text-[13px] leading-relaxed" style={{ color: 'rgba(244,241,235,0.75)' }}>{item}</span>
                 </div>

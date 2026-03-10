@@ -57,9 +57,9 @@ export function ROICalculatorSection() {
   }, [router])
 
   return (
-    <section className="py-20 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
+    <section className="py-14 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
       <div className="max-w-xl mx-auto px-5">
-        <motion.div {...sAnim} className="text-center mb-10">
+        <motion.div {...sAnim} className="text-center mb-8 md:mb-10">
           <h2 className="text-[24px] md:text-[36px] font-bold tracking-tight mb-4" style={{ color: '#f4f1eb' }}>
             {no ? 'Hva taper' : 'What are'} <span className="text-gradient-gold">{no ? 'du' : 'you'}</span> {no ? 'per måned?' : 'losing per month?'}
           </h2>

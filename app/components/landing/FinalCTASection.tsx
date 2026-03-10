@@ -45,7 +45,7 @@ export function FinalCTASection() {
   }, [openBooking])
 
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
+    <section className="py-16 md:py-32 relative overflow-hidden" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
       <div className="cta-glow" />
       <div className="max-w-2xl mx-auto px-5 text-center relative z-10">
         <motion.div {...sAnim}>

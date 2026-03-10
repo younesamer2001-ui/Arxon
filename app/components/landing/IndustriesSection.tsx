@@ -29,9 +29,9 @@ export function IndustriesSection() {
   const no = lang === 'no'
 
   return (
-    <section className="py-20 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
+    <section className="py-14 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
       <div className="max-w-4xl mx-auto px-5">
-        <motion.div {...sAnim} className="text-center mb-14">
+        <motion.div {...sAnim} className="text-center mb-10 md:mb-14">
           <h2 className="text-[28px] md:text-[42px] font-bold tracking-tight mb-4" style={{ color: '#f4f1eb' }}>
             {no ? 'Skreddersydd for' : 'Tailored for'} <span className="text-gradient-gold">{no ? 'din bransje' : 'your industry'}</span>
           </h2>
@@ -40,7 +40,7 @@ export function IndustriesSection() {
           </p>
         </motion.div>
 
-        <motion.div className="grid grid-cols-2 md:grid-cols-5 gap-4" {...staggerContainer}>
+        <motion.div className="grid grid-cols-3 md:grid-cols-5 gap-3 md:gap-4" {...staggerContainer}>
           {(no ? [
             { icon: Hammer, label: 'Bygg & Håndverk', count: 12, slug: 'bygg-og-handverk' },
             { icon: HomeIcon, label: 'Eiendom', count: 12, slug: 'eiendomsmegling' },
