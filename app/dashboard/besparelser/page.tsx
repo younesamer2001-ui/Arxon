@@ -346,9 +346,10 @@ export default function BesparelserPage() {
           color: '#555',
           fontSize: 12
         }}>
-          Alle tall er basert p\u00e5 faktiske data fra dine automatiseringer
+          Alle tall er basert på faktiske data fra dine automatiseringer
         </div>
       </div>
     </div>
   )
 }
+
