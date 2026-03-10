@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { gold, goldRgb, bg, fonts } from '@/lib/constants'
 import {
   LayoutDashboard, Phone, Users, CalendarCheck, Settings,
-  Link2, Menu, X, ChevronRight, Zap, Package, Bell, PiggyBank, HelpCircle
+  Link2, Menu, X, ChevronRight, Zap, Package, Bell, Activity, HelpCircle
 } from 'lucide-react'
 
 const sidebarSections = [
@@ -14,7 +14,7 @@ const sidebarSections = [
     label: null,
     links: [
       { href: '/dashboard', label: 'Oversikt', icon: LayoutDashboard },
-      { href: '/dashboard/besparelser', label: 'Besparelser', icon: PiggyBank },
+      { href: '/dashboard/besparelser', label: 'Aktivitet', icon: Activity },
     ]
   },
   {
@@ -239,3 +239,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   )
 }
+
