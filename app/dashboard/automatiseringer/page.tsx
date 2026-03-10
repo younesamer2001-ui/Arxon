@@ -43,19 +43,19 @@ const healthConfig: Record<HealthStatus, { color: string; icon: typeof CheckCirc
 }
 
 const statusConfig: Record<WorkflowStatus, { color: string; label: string; description: string }> = {
-  pending_setup: { color: '#64748b', label: 'Venter oppsett', description: 'Workflowen venter pÃ¥ at integrasjoner settes opp' },
-  awaiting_integrations: { color: '#f59e0b', label: 'Mangler tilkoblinger', description: 'Noen integrasjoner mÃ¥ kobles til fÃ¸rst' },
+  pending_setup: { color: '#64748b', label: 'Venter oppsett', description: 'Workflowen venter på at integrasjoner settes opp' },
+  awaiting_integrations: { color: '#f59e0b', label: 'Mangler tilkoblinger', description: 'Noen integrasjoner må kobles til først' },
   ready: { color: '#3b82f6', label: 'Klar', description: 'Alle integrasjoner er tilkoblet â klar til aktivering' },
-  active: { color: '#10b981', label: 'Aktiv', description: 'Workflowen kjÃ¸rer normalt' },
+  active: { color: '#10b981', label: 'Aktiv', description: 'Workflowen kjører normalt' },
   paused: { color: '#64748b', label: 'Pauset', description: 'Workflowen er midlertidig stoppet' },
-  error: { color: '#ef4444', label: 'Feil', description: 'Det oppstod en feil â vi ser pÃ¥ det' },
+  error: { color: '#ef4444', label: 'Feil', description: 'Det oppstod en feil â vi ser på det' },
 }
 
 function timeAgo(dateStr: string | null): string {
   if (!dateStr) return 'Aldri'
   const diff = Date.now() - new Date(dateStr).getTime()
   const mins = Math.floor(diff / 60000)
-  if (mins < 1) return 'Akkurat nÃ¥'
+  if (mins < 1) return 'Akkurat nå'
   if (mins < 60) return `${mins}m siden`
   const hours = Math.floor(mins / 60)
   if (hours < 24) return `${hours}t siden`
@@ -203,9 +203,9 @@ export default function AutomatiseringerPage() {
       <div style={{ fontFamily: fonts.body, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
         <div style={{ textAlign: 'center', maxWidth: 400 }}>
           <Zap size={48} style={{ color: 'rgba(255,255,255,0.15)', marginBottom: 16 }} />
-          <h2 style={{ color: '#fff', fontSize: 20, fontWeight: 600, marginBottom: 8 }}>Ingen automatiseringer ennÃ¥</h2>
+          <h2 style={{ color: '#fff', fontSize: 20, fontWeight: 600, marginBottom: 8 }}>Ingen automatiseringer ennå</h2>
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, lineHeight: 1.6 }}>
-            NÃ¥r du kjÃ¸per automatiseringer via pakkebyggeren, vil de dukke opp her med status og oppfÃ¸lging.
+            Når du kjøper automatiseringer via pakkebyggeren, vil de dukke opp her med status og oppfølging.
           </p>
           <a
             href="/pakkebygger"
@@ -216,7 +216,7 @@ export default function AutomatiseringerPage() {
               textDecoration: 'none',
             }}
           >
-            GÃ¥ til pakkebygger <ArrowUpRight size={16} />
+            Gå til pakkebygger <ArrowUpRight size={16} />
           </a>
         </div>
       </div>
@@ -245,7 +245,7 @@ export default function AutomatiseringerPage() {
             Mine Automatiseringer
           </h1>
           <p style={{ color: '#94a3b8', marginTop: 6, fontSize: 14 }}>
-            OvervÃ¥k status og fremdrift for dine kjÃ¸pte automatiseringer.
+            Overvåk status og fremdrift for dine kjøpte automatiseringer.
           </p>
         </div>
         <button
@@ -266,7 +266,7 @@ export default function AutomatiseringerPage() {
             <span style={{ fontSize: 13, color: '#94a3b8' }}>Totalt</span>
           </div>
           <div style={{ fontSize: 32, fontWeight: 700, color: '#fff' }}>{workflows.length}</div>
-          <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>automatiseringer kjÃ¸pt</div>
+          <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>automatiseringer kjøpt</div>
         </div>
         <div className="stat-card">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
@@ -274,7 +274,7 @@ export default function AutomatiseringerPage() {
             <span style={{ fontSize: 13, color: '#94a3b8' }}>Aktive</span>
           </div>
           <div style={{ fontSize: 32, fontWeight: 700, color: '#10b981' }}>{activeCount}</div>
-          <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>kjÃ¸rer nÃ¥</div>
+          <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>kjører nå</div>
         </div>
         <div className="stat-card">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
@@ -282,7 +282,7 @@ export default function AutomatiseringerPage() {
             <span style={{ fontSize: 13, color: '#94a3b8' }}>Klare</span>
           </div>
           <div style={{ fontSize: 32, fontWeight: 700, color: '#3b82f6' }}>{readyCount}</div>
-          <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>venter pÃ¥ aktivering</div>
+          <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>venter på aktivering</div>
         </div>
         <div className="stat-card">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
@@ -429,7 +429,7 @@ export default function AutomatiseringerPage() {
               padding: '14px 16px', borderRadius: 10, marginBottom: 16,
               background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
             }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 12 }}>NÃ¸dvendige integrasjoner</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 12 }}>Nødvendige integrasjoner</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {selectedWf.requiredIntegrations.map(svc => {
                   const isConnected = selectedWf.connectedIntegrations.includes(svc)
@@ -459,7 +459,7 @@ export default function AutomatiseringerPage() {
                     border: `1px solid rgba(${goldRgb},0.2)`,
                   }}
                 >
-                  GÃ¥ til integrasjoner <ChevronRight size={14} />
+                  Gå til integrasjoner <ChevronRight size={14} />
                 </a>
               )}
             </div>
@@ -480,7 +480,7 @@ export default function AutomatiseringerPage() {
                     color: '#3b82f6', fontSize: 13, textDecoration: 'none',
                   }}
                 >
-                  Ãpne i n8n <ArrowUpRight size={14} />
+                  Åpne i n8n <ArrowUpRight size={14} />
                 </a>
               </div>
             )}
@@ -498,7 +498,7 @@ export default function AutomatiseringerPage() {
                 </div>
                 {selectedWf.lastRun && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                    <span style={{ color: '#94a3b8' }}>Sist kjÃ¸rt</span>
+                    <span style={{ color: '#94a3b8' }}>Sist kjørt</span>
                     <span style={{ color: '#e2e8f0' }}>{timeAgo(selectedWf.lastRun)}</span>
                   </div>
                 )}
@@ -521,3 +521,4 @@ export default function AutomatiseringerPage() {
     </div>
   )
 }
+
