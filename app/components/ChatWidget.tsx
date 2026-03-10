@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mic, Volume2, Loader2, Sparkles, X, MicOff, FileText, RefreshCw, Mail } from 'lucide-react'
+import { Mic, Volume2, Loader2, Sparkles, X, MicOff, FileText, RefreshCw, Mail, ChevronDown, ChevronUp } from 'lucide-react'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    1. DESIGN TOKENS & CONSTANTS
@@ -54,6 +54,7 @@ export default function ChatWidget() {
 
   // --- UI State ---
   const [open, setOpen] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
   
   // --- Vapi & Call State ---
   const [isCallActive, setIsCallActive] = useState(false)
@@ -80,10 +81,35 @@ export default function ChatWidget() {
   const vapiRef = useRef<any>(null)
   const animationRef = useRef<number>()
   const durationTimerRef = useRef<NodeJS.Timeout>()
+  const lastScrollY = useRef(0)
+
+  /* ─── Auto-Minimize on Scroll ─── */
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      // If we scroll down while call is active and widget is open/expanded, minimize it
+      if (currentScrollY > lastScrollY.current + 20 && open && isCallActive && !isMinimized) {
+        setIsMinimized(true);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      return () => window.removeEventListener('scroll', handleScroll);
+    }
+  }, [open, isCallActive, isMinimized]);
+
+  /* ─── Expand automatically when call ends to show summary ─── */
+  useEffect(() => {
+    if (!isCallActive && isMinimized && history.length > 0) {
+      setIsMinimized(false);
+    }
+  }, [isCallActive, isMinimized, history.length]);
 
   /* ─── Initialize Ambient Particles ─── */
   useEffect(() => {
-    if (!open) return;
+    if (!open || isMinimized) return; // Don't run particles when minimized
     
     const generateParticles = () => {
       const newParticles: Particle[] = [];
@@ -119,7 +145,7 @@ export default function ChatWidget() {
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [open]);
+  }, [open, isMinimized]);
 
   /* ─── Initialize Vapi ─── */
   useEffect(() => {
@@ -323,6 +349,7 @@ export default function ChatWidget() {
   const handleClose = useCallback(() => {
     if (isCallActive) vapiRef.current?.stop()
     setOpen(false)
+    setIsMinimized(false)
   }, [isCallActive])
 
   if (!publicKey || !assistantId) return null
@@ -366,10 +393,65 @@ export default function ChatWidget() {
         </button>
       )}
 
-      {/* ── Siri-style Voice Panel ── */}
       <AnimatePresence>
-        {open && (
+        {/* ── Minimized Compact Bar ── */}
+        {open && isMinimized && (
+          <motion.div
+            key="minimized-panel"
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-5 sm:w-[340px] h-16 rounded-full overflow-hidden flex items-center justify-between px-2 z-[9999]"
+            style={{
+              background: COLORS.bg,
+              border: `1px solid rgba(239, 192, 123, 0.2)`,
+              boxShadow: `0 10px 40px rgba(0,0,0,0.8)`
+            }}
+          >
+            {/* Indicator */}
+            <div className="flex items-center gap-3 pl-2">
+              <div className="relative w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: `${activeColor}20` }}>
+                <Mic className="w-4 h-4" style={{ color: activeColor }} />
+                {isActive && (
+                  <motion.div 
+                    className="absolute inset-0 rounded-full border border-current pointer-events-none" 
+                    style={{ color: activeColor }} 
+                    animate={{ scale: [1, 1.6], opacity: [0.6, 0] }} 
+                    transition={{ duration: 1.5, repeat: Infinity }} 
+                  />
+                )}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[13px] font-medium" style={{ color: activeColor }}>{statusText}</span>
+                {isCallActive && <span className="text-[10px]" style={{ color: COLORS.textMuted }}>{formatTime(duration)}</span>}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-1 pr-1">
+              <button 
+                onClick={() => setIsMinimized(false)} 
+                className="p-2.5 rounded-full hover:bg-white/10 transition-colors"
+                aria-label="Utvid widget"
+              >
+                <ChevronUp className="w-5 h-5" style={{ color: COLORS.textPrimary }} />
+              </button>
+              <button 
+                onClick={handleClose} 
+                className="p-2.5 rounded-full transition-colors hover:bg-red-500/30"
+                style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)' }}
+                aria-label="Avslutt samtale"
+              >
+                <X className="w-5 h-5 text-red-400" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── Full Siri-style Voice Panel ── */}
+        {open && !isMinimized && (
           <motion.div 
+            key="full-panel"
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -425,9 +507,14 @@ export default function ChatWidget() {
                   <p className="text-xs" style={{ color: COLORS.textMuted }}>Arxon AI-assistent</p>
                 </div>
               </div>
-              <button onClick={handleClose} className="p-2 rounded-full hover:bg-white/5 transition-colors" style={{ color: COLORS.textMuted }}>
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setIsMinimized(true)} className="p-2 rounded-full hover:bg-white/5 transition-colors" style={{ color: COLORS.textMuted }} aria-label="Minimer">
+                  <ChevronDown className="w-5 h-5" />
+                </button>
+                <button onClick={handleClose} className="p-2 rounded-full hover:bg-white/5 transition-colors" style={{ color: COLORS.textMuted }} aria-label="Lukk">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* View Switcher: Call Interface vs Gemini Post-Call Tools */}
