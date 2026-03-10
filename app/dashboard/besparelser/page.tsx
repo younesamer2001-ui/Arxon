@@ -1,355 +1,352 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { gold, goldRgb, bg, fonts } from '@/lib/constants'
-import { TrendingUp, Clock, Phone, PiggyBank, BarChart3, ArrowDown, ArrowUp, Loader2 } from 'lucide-react'
+import { Phone, Clock, Calendar, User, Activity, Loader2, PhoneCall, CalendarCheck, UserCheck } from 'lucide-react'
 
-interface SavingsData {
-  totalMoneySaved: number
-  timeSavedHours: number
-  roi: number
-  totalCallsHandled: number
-  monthsActive: number
-  activeAutomations: string[]
-  isEstimate: boolean
-  orderDate: string
-  categoryBreakdown: { category: string; saved: number; label: string }[]
-  monthlyData: { month: string; saved: number; calls: number }[]
-  beforeAfter: { label: string; before: number; after: number; unit: string }[]
+interface ActivityData {
+  totalCalls: number
+  totalLeads: number
+  totalBookings: number
+  totalActivities: number
+  totalDurationSeconds: number
+  avgDurationSeconds: number
+  customerSince: string
+  customerName: string
+  recentActivities: {
+    id: string
+    type: string
+    duration_seconds: number
+    created_at: string
+    summary: string | null
+    name: string | null
+    phone: string | null
+  }[]
 }
 
-function useAnimatedCounter(end: number, duration = 2000, startOnView = true) {
-  const [count, setCount] = useState(0)
-  const ref = useRef<HTMLSpanElement>(null)
-  const hasAnimated = useRef(false)
+function formatDuration(seconds: number): string {
+  if (seconds < 60) return seconds + 's'
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  if (m < 60) return m + 'min ' + (s > 0 ? s + 's' : '')
+  const h = Math.floor(m / 60)
+  return h + 't ' + (m % 60) + 'min'
+}
 
-  useEffect(() => {
-    if (!startOnView || hasAnimated.current) return
-    const el = ref.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated.current) {
-          hasAnimated.current = true
-          const startTime = performance.now()
-          const animate = (now: number) => {
-            const elapsed = now - startTime
-            const progress = Math.min(elapsed / duration, 1)
-            const eased = 1 - Math.pow(1 - progress, 3)
-            setCount(Math.round(eased * end))
-            if (progress < 1) requestAnimationFrame(animate)
-          }
-          requestAnimationFrame(animate)
-        }
-      },
-      { threshold: 0.3 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [end, duration, startOnView])
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('nb-NO', {
+    day: 'numeric', month: 'short', year: 'numeric'
+  })
+}
 
-  return { count, ref }
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 60) return mins + ' min siden'
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return hrs + ' timer siden'
+  const days = Math.floor(hrs / 24)
+  if (days < 7) return days + (days === 1 ? ' dag' : ' dager') + ' siden'
+  return formatDate(iso)
+}
+
+function typeLabel(type: string): string {
+  switch (type) {
+    case 'phone_call': return 'Telefonsamtale'
+    case 'lead_qualified': return 'Lead kvalifisert'
+    case 'booking_created': return 'Booking opprettet'
+    default: return type
+  }
+}
+
+function typeIcon(type: string) {
+  switch (type) {
+    case 'phone_call': return PhoneCall
+    case 'lead_qualified': return UserCheck
+    case 'booking_created': return CalendarCheck
+    default: return Activity
+  }
 }
 
 export default function BesparelserPage() {
-  const [data, setData] = useState<SavingsData | null>(null)
+  const [data, setData] = useState<ActivityData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    async function fetchSavings() {
+    async function load() {
       try {
-        let savingsData = null
-        try {
-          const orderRes = await fetch('/api/customer/order')
-          if (orderRes.ok) {
-            const orderData = await orderRes.json()
-            const cid = orderData.order?.id
-            if (cid) {
-              const savingsRes = await fetch('/api/savings?customer_id=' + cid)
-              if (savingsRes.ok) {
-                savingsData = await savingsRes.json()
-              }
-            }
-          }
-        } catch (_) {}
+        const orderRes = await fetch('/api/customer/order')
+        if (!orderRes.ok) throw new Error('Kunne ikke hente kundedata')
+        const { order } = await orderRes.json()
 
-        if (!savingsData) {
-          const months = ['Okt', 'Nov', 'Des', 'Jan', 'Feb', 'Mar']
-          savingsData = {
-            totalMoneySaved: 54750,
-            timeSavedHours: 187,
-            roi: 612,
-            totalCallsHandled: 2100,
-            monthsActive: 3,
-            activeAutomations: ['phone', 'leads', 'booking'],
-            isEstimate: true,
-            orderDate: new Date().toISOString(),
-            categoryBreakdown: [
-              { category: 'phone', saved: 23250, label: 'Telefonhåndtering' },
-              { category: 'leads', saved: 26280, label: 'Lead-kvalifisering' },
-              { category: 'booking', saved: 9600, label: 'Booking-automatisering' },
-            ],
-            monthlyData: months.map((m, i) => ({
-              month: m,
-              saved: Math.round(8000 + i * 2200 + Math.random() * 1500),
-              calls: Math.round(280 + i * 60),
-            })),
-            beforeAfter: [
-              { label: 'Kostnad per samtale', before: 17.5, after: 2.0, unit: 'kr' },
-              { label: 'Kostnad per lead', before: 85, after: 12, unit: 'kr' },
-              { label: 'Kostnad per booking', before: 45, after: 5, unit: 'kr' },
-            ],
-          }
-        }
-        setData(savingsData)
-      } catch (e) {
-        setError('Noe gikk galt ved lasting av data')
+        const savingsRes = await fetch(`/api/savings?customer_id=${order.id}`)
+        if (!savingsRes.ok) throw new Error('Kunne ikke hente aktivitetsdata')
+        const result = await savingsRes.json()
+        setData(result)
+      } catch (e: any) {
+        setError(e.message)
       } finally {
         setLoading(false)
       }
     }
-    fetchSavings()
+    load()
   }, [])
-
-  const moneySaved = useAnimatedCounter(data?.totalMoneySaved || 0)
-  const timeSaved = useAnimatedCounter(data?.timeSavedHours || 0)
-  const roiCounter = useAnimatedCounter(data?.roi || 0)
-  const callsCounter = useAnimatedCounter(data?.totalCallsHandled || 0)
 
   if (loading) {
     return (
-      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
-        <Loader2 size={40} style={{ color: gold, animation: 'spin 1s linear infinite' }} />
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontFamily: fonts.body }}>Laster besparelsesdata...</p>
+      <div style={{
+        minHeight: '100vh',
+        background: bg,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: fonts
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <Loader2
+            size={40}
+            style={{ color: gold, animation: 'spin 1s linear infinite' }}
+          />
+          <p style={{ color: '#999', marginTop: 16 }}>Henter aktivitetsdata...</p>
+        </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
       </div>
     )
   }
 
-  if (error || !data) {
+  if (error) {
     return (
-      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
-        <PiggyBank size={48} style={{ color: 'rgba(255,255,255,0.3)' }} />
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontFamily: fonts.body, textAlign: 'center', maxWidth: 400 }}>
-          {error || 'Ingen data tilgjengelig ennå. Besparelser beregnes automatisk når AI-automatiseringene dine er aktive.'}
-        </p>
+      <div style={{
+        minHeight: '100vh',
+        background: bg,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: fonts
+      }}>
+        <div style={{
+          background: 'rgba(255,59,48,0.1)',
+          border: '1px solid rgba(255,59,48,0.3)',
+          borderRadius: 12,
+          padding: '24px 32px',
+          maxWidth: 400,
+          textAlign: 'center'
+        }}>
+          <p style={{ color: '#ff3b30', fontWeight: 600, marginBottom: 8 }}>
+            Kunne ikke laste data
+          </p>
+          <p style={{ color: '#999', fontSize: 14 }}>{error}</p>
+        </div>
       </div>
     )
   }
 
-  const maxSaved = Math.max(...data.monthlyData.map(d => d.saved), 1)
+  if (!data) return null
+
+  const stats = [
+    {
+      label: 'Samtaler h\u00e5ndtert',
+      value: data.totalCalls.toString(),
+      icon: PhoneCall,
+      sub: 'Totalt antall AI-samtaler'
+    },
+    {
+      label: 'Total samtaletid',
+      value: formatDuration(data.totalDurationSeconds),
+      icon: Clock,
+      sub: `Snitt ${formatDuration(data.avgDurationSeconds)} per samtale`
+    },
+    {
+      label: 'Leads kvalifisert',
+      value: data.totalLeads.toString(),
+      icon: UserCheck,
+      sub: 'Kvalifiserte leads fra AI'
+    },
+    {
+      label: 'Kunde siden',
+      value: formatDate(data.customerSince),
+      icon: Calendar,
+      sub: data.customerName
+    }
+  ]
 
   return (
-    <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-      {data.isEstimate && (
-        <div style={{
-          background: 'rgba(' + goldRgb + ',0.08)',
-          border: '1px solid rgba(' + goldRgb + ',0.2)',
-          borderRadius: 12,
-          padding: '12px 20px',
-          marginBottom: 24,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          fontFamily: fonts.body,
-          fontSize: 13,
-          color: 'rgba(255,255,255,0.7)'
-        }}>
-          <BarChart3 size={16} style={{ color: gold, flexShrink: 0 }} />
-          <span>Disse tallene er <strong style={{ color: gold }}>estimater</strong> basert på dine aktive automatiseringer. Nøyaktige data vises når AI-en har vært aktiv lenger.</span>
-        </div>
-      )}
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 32 }}>
-        {[
-          { label: 'Penger spart', value: moneySaved, suffix: ' kr', icon: PiggyBank, color: '#22c55e' },
-          { label: 'Timer spart', value: timeSaved, suffix: ' timer', icon: Clock, color: '#3b82f6' },
-          { label: 'Avkastning (ROI)', value: roiCounter, suffix: '%', icon: TrendingUp, color: gold },
-          { label: 'Samtaler håndtert', value: callsCounter, suffix: '', icon: Phone, color: '#a855f7' },
-        ].map((stat, i) => {
-          const Icon = stat.icon
-          return (
-            <div key={i} style={{
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.06)',
-              borderRadius: 16,
-              padding: 24,
-              position: 'relative',
-              overflow: 'hidden',
-            }}>
-              <div style={{
-                position: 'absolute',
-                top: -20,
-                right: -20,
-                width: 80,
-                height: 80,
-                borderRadius: '50%',
-                background: stat.color,
-                opacity: 0.06,
-              }} />
-              <Icon size={20} style={{ color: stat.color, marginBottom: 12 }} />
-              <div style={{ fontFamily: fonts.heading, fontSize: 32, fontWeight: 700, color: '#fff', lineHeight: 1 }}>
-                <span ref={stat.value.ref}>
-                  {stat.value.count.toLocaleString('nb-NO')}
-                </span>
-                <span style={{ fontSize: 16, color: stat.color, fontWeight: 500 }}>{stat.suffix}</span>
-              </div>
-              <div style={{ fontFamily: fonts.body, fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 6 }}>{stat.label}</div>
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Monthly Chart */}
-      <div style={{
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.06)',
-        borderRadius: 16,
-        padding: 28,
-        marginBottom: 24,
-      }}>
-        <h3 style={{ fontFamily: fonts.heading, fontSize: 18, color: '#fff', marginBottom: 4 }}>Månedlig besparelse</h3>
-        <p style={{ fontFamily: fonts.body, fontSize: 13, color: 'rgba(255,255,255,0.4)', marginBottom: 24 }}>
-          Siste {data.monthlyData.length} måneder — {data.isEstimate ? 'estimert' : 'faktisk'} besparelse i NOK
-        </p>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 180 }}>
-          {data.monthlyData.map((m, i) => (
-            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontFamily: fonts.body, fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
-                {(m.saved / 1000).toFixed(0)}k
-              </span>
-              <div style={{
-                width: '100%',
-                maxWidth: 48,
-                height: `${Math.max((m.saved / maxSaved) * 140, 4)}px`,
-                borderRadius: 6,
-                background: i === data.monthlyData.length - 1
-                  ? `linear-gradient(to top, rgba(${goldRgb},0.6), ${gold})`
-                  : `linear-gradient(to top, rgba(${goldRgb},0.15), rgba(${goldRgb},0.35))`,
-                transition: 'height 0.6s ease',
-              }} />
-              <span style={{ fontFamily: fonts.body, fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
-                {m.month}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Two column layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
-        
-        {/* Before / After */}
-        <div style={{
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.06)',
-          borderRadius: 16,
-          padding: 28,
-        }}>
-          <h3 style={{ fontFamily: fonts.heading, fontSize: 18, color: '#fff', marginBottom: 20 }}>Før vs. Etter Arxon</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {data.beforeAfter.map((item, i) => {
-              const reduction = Math.round(((item.before - item.after) / item.before) * 100)
-              return (
-                <div key={i}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                    <span style={{ fontFamily: fonts.body, fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>{item.label}</span>
-                    <span style={{
-                      fontFamily: fonts.body,
-                      fontSize: 12,
-                      color: '#22c55e',
-                      background: 'rgba(34,197,94,0.1)',
-                      padding: '2px 8px',
-                      borderRadius: 6,
-                    }}>
-                      <ArrowDown size={10} style={{ display: 'inline', verticalAlign: 'middle' }} /> {reduction}%
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{
-                        height: 8,
-                        borderRadius: 4,
-                        background: 'rgba(239,68,68,0.25)',
-                        width: '100%',
-                      }} />
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                        <span style={{ fontFamily: fonts.body, fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>Før</span>
-                        <span style={{ fontFamily: fonts.body, fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>{item.before.toLocaleString('nb-NO')} {item.unit}</span>
-                      </div>
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{
-                        height: 8,
-                        borderRadius: 4,
-                        background: `linear-gradient(90deg, rgba(${goldRgb},0.4), ${gold})`,
-                        width: `${Math.round((item.after / item.before) * 100)}%`,
-                      }} />
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                        <span style={{ fontFamily: fonts.body, fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>Etter</span>
-                        <span style={{ fontFamily: fonts.body, fontSize: 11, color: gold }}>{item.after.toLocaleString('nb-NO')} {item.unit}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Category Breakdown */}
-        <div style={{
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.06)',
-          borderRadius: 16,
-          padding: 28,
-        }}>
-          <h3 style={{ fontFamily: fonts.heading, fontSize: 18, color: '#fff', marginBottom: 20 }}>Besparelse per kategori</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {data.categoryBreakdown.map((cat, i) => {
-              const maxCat = Math.max(...data.categoryBreakdown.map(c => c.saved), 1)
-              const colors = ['#22c55e', '#3b82f6', '#a855f7']
-              return (
-                <div key={i}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <span style={{ fontFamily: fonts.body, fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>{cat.label}</span>
-                    <span style={{ fontFamily: fonts.body, fontSize: 13, color: '#fff', fontWeight: 600 }}>
-                      {cat.saved.toLocaleString('nb-NO')} kr
-                    </span>
-                  </div>
-                  <div style={{ height: 8, borderRadius: 4, background: 'rgba(255,255,255,0.05)' }}>
-                    <div style={{
-                      height: '100%',
-                      borderRadius: 4,
-                      width: `${(cat.saved / maxCat) * 100}%`,
-                      background: colors[i % colors.length],
-                      opacity: 0.6,
-                      transition: 'width 0.8s ease',
-                    }} />
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-
-          <div style={{
-            marginTop: 24,
-            padding: '16px 20px',
-            background: 'rgba(' + goldRgb + ',0.06)',
-            borderRadius: 12,
-            border: '1px solid rgba(' + goldRgb + ',0.12)',
+    <div style={{
+      minHeight: '100vh',
+      background: bg,
+      padding: '32px 24px',
+      fontFamily: fonts
+    }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+        {/* Header */}
+        <div style={{ marginBottom: 32 }}>
+          <h1 style={{
+            color: '#fff',
+            fontSize: 28,
+            fontWeight: 700,
+            marginBottom: 4
           }}>
-            <div style={{ fontFamily: fonts.body, fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>
-              Total besparelse
-            </div>
-            <div style={{ fontFamily: fonts.heading, fontSize: 28, fontWeight: 700, color: gold }}>
-              {data.totalMoneySaved.toLocaleString('nb-NO')} kr
-            </div>
-            <div style={{ fontFamily: fonts.body, fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
-              over {data.monthsActive} {data.monthsActive === 1 ? 'måned' : 'måneder'}
-            </div>
+            Aktivitetsoversikt
+          </h1>
+          <p style={{ color: '#888', fontSize: 14 }}>
+            Sanntidsdata fra dine AI-automatiseringer
+          </p>
+        </div>
+
+        {/* Stat cards */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: 16,
+          marginBottom: 32
+        }}>
+          {stats.map((s, i) => {
+            const Icon = s.icon
+            return (
+              <div key={i} style={{
+                background: 'rgba(255,255,255,0.03)',
+                border: `1px solid rgba(${goldRgb}, 0.15)`,
+                borderRadius: 12,
+                padding: '20px 20px 16px'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  marginBottom: 12
+                }}>
+                  <Icon size={18} style={{ color: gold, opacity: 0.8 }} />
+                  <span style={{ color: '#888', fontSize: 13 }}>{s.label}</span>
+                </div>
+                <div style={{
+                  color: '#fff',
+                  fontSize: 26,
+                  fontWeight: 700,
+                  marginBottom: 4
+                }}>
+                  {s.value}
+                </div>
+                <div style={{ color: '#666', fontSize: 12 }}>{s.sub}</div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Activity feed */}
+        <div style={{
+          background: 'rgba(255,255,255,0.02)',
+          border: `1px solid rgba(${goldRgb}, 0.1)`,
+          borderRadius: 12,
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            padding: '16px 20px',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8
+          }}>
+            <Activity size={16} style={{ color: gold }} />
+            <span style={{ color: '#fff', fontWeight: 600, fontSize: 15 }}>
+              Siste aktiviteter
+            </span>
+            <span style={{ color: '#666', fontSize: 13, marginLeft: 'auto' }}>
+              {data.totalActivities} totalt
+            </span>
           </div>
+
+          {data.recentActivities.length === 0 ? (
+            <div style={{ padding: 40, textAlign: 'center' }}>
+              <p style={{ color: '#666' }}>Ingen aktiviteter registrert enn\u00e5</p>
+            </div>
+          ) : (
+            data.recentActivities.map((a, i) => {
+              const Icon = typeIcon(a.type)
+              return (
+                <div key={a.id} style={{
+                  padding: '14px 20px',
+                  borderBottom: i < data.recentActivities.length - 1
+                    ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 12
+                }}>
+                  <div style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    background: `rgba(${goldRgb}, 0.1)`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    marginTop: 2
+                  }}>
+                    <Icon size={16} style={{ color: gold }} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      marginBottom: 2
+                    }}>
+                      <span style={{ color: '#fff', fontSize: 14, fontWeight: 500 }}>
+                        {typeLabel(a.type)}
+                      </span>
+                      {a.duration_seconds > 0 && (
+                        <span style={{
+                          color: '#666',
+                          fontSize: 12,
+                          background: 'rgba(255,255,255,0.05)',
+                          padding: '1px 6px',
+                          borderRadius: 4
+                        }}>
+                          {formatDuration(a.duration_seconds)}
+                        </span>
+                      )}
+                    </div>
+                    {(a.name || a.phone) && (
+                      <div style={{ color: '#aaa', fontSize: 13, marginBottom: 2 }}>
+                        {a.name}{a.name && a.phone ? ' \u00b7 ' : ''}{a.phone}
+                      </div>
+                    )}
+                    {a.summary && (
+                      <div style={{
+                        color: '#777',
+                        fontSize: 13,
+                        lineHeight: 1.4,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {a.summary}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{
+                    color: '#555',
+                    fontSize: 12,
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0
+                  }}>
+                    {timeAgo(a.created_at)}
+                  </div>
+                </div>
+              )
+            })
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          textAlign: 'center',
+          padding: '24px 0 16px',
+          color: '#555',
+          fontSize: 12
+        }}>
+          Alle tall er basert p\u00e5 faktiske data fra dine automatiseringer
         </div>
       </div>
     </div>
