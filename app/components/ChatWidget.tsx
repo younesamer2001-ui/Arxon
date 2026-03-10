@@ -1,34 +1,44 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Mic, Volume2, Loader2, Sparkles, X, MicOff } from 'lucide-react'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    1. DESIGN TOKENS & CONSTANTS
-   Moved outside the component to prevent recreation on every volume-level render.
    ───────────────────────────────────────────────────────────────────────────── */
 const COLORS = {
   gold: '#efc07b',
   goldDark: '#c9a96e',
-  goldRgb: '239,192,123',
   bg: '#050510',
   surface: '#0c0c1a',
   textPrimary: '#f0ede8',
   textMuted: '#7a7a8e',
   listening: '#8b7cf8',
-  speaking: '#6b8aff',
+  speaking: '#efc07b',
+  thinking: '#c9a96e',
 }
 
 const LABELS = {
-  tapToTalk: 'Trykk for å snakke med Eirik',
+  tapToTalk: 'Trykk for å snakke',
   connecting: 'Kobler til...',
-  connected: 'Tilkoblet',
-  speaking: 'Eirik snakker...',
-  thinking: 'Eirik tenker...', // New state to mask latency
+  connected: 'Klar til å lytte',
+  speaking: 'Eirik svarer...',
+  thinking: 'Eirik tenker...',
   listening: 'Lytter...',
   error: 'Noe gikk galt — prøv igjen',
 } as const
 
 type StatusKey = keyof typeof LABELS | ''
+
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  opacity: number;
+  velocity: { x: number; y: number };
+}
 
 /* ─────────────────────────────────────────────────────────────────────────────
    2. MAIN COMPONENT
@@ -45,12 +55,59 @@ export default function ChatWidget() {
   const [isConnecting, setIsConnecting] = useState(false)
   const [statusKey, setStatusKey] = useState<StatusKey>('')
   const [volumeLevel, setVolumeLevel] = useState(0)
+  const [duration, setDuration] = useState(0)
   
   // --- Transcripts ---
   const [userTranscript, setUserTranscript] = useState('')
   const [assistantTranscript, setAssistantTranscript] = useState('')
 
+  // --- Visuals ---
+  const [particles, setParticles] = useState<Particle[]>([])
+  const [waveformData, setWaveformData] = useState<number[]>(Array(24).fill(0))
+  
   const vapiRef = useRef<any>(null)
+  const animationRef = useRef<number>()
+  const durationTimerRef = useRef<NodeJS.Timeout>()
+
+  /* ─── Initialize Ambient Particles ─── */
+  useEffect(() => {
+    if (!open) return;
+    
+    const generateParticles = () => {
+      const newParticles: Particle[] = [];
+      for (let i = 0; i < 25; i++) {
+        newParticles.push({
+          id: i,
+          x: Math.random() * 340, // Widget width approx
+          y: Math.random() * 500, // Widget height approx
+          size: Math.random() * 2.5 + 1,
+          opacity: Math.random() * 0.4 + 0.1,
+          velocity: {
+            x: (Math.random() - 0.5) * 0.4,
+            y: (Math.random() - 0.5) * 0.4
+          }
+        });
+      }
+      setParticles(newParticles);
+    };
+
+    generateParticles();
+
+    const animateParticles = () => {
+      setParticles(prev => prev.map(particle => ({
+        ...particle,
+        x: (particle.x + particle.velocity.x + 340) % 340,
+        y: (particle.y + particle.velocity.y + 500) % 500,
+        opacity: particle.opacity + (Math.random() - 0.5) * 0.015
+      })));
+      animationRef.current = requestAnimationFrame(animateParticles);
+    };
+
+    animationRef.current = requestAnimationFrame(animateParticles);
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
+  }, [open]);
 
   /* ─── Initialize Vapi ─── */
   useEffect(() => {
@@ -59,7 +116,6 @@ export default function ChatWidget() {
 
     const initVapi = async () => {
       try {
-        // Dynamically import Vapi to bypass bundler static resolution issues
         const module = await new Function("return import('https://esm.sh/@vapi-ai/web')")()
         const Vapi = module.default
         
@@ -69,9 +125,14 @@ export default function ChatWidget() {
         vapiInstance.on('call-start', () => {
           setIsCallActive(true)
           setIsConnecting(false)
-          setStatusKey('connected')
+          setStatusKey('listening')
           setUserTranscript('')
           setAssistantTranscript('')
+          setDuration(0)
+          
+          durationTimerRef.current = setInterval(() => {
+            setDuration(prev => prev + 1)
+          }, 1000)
         })
 
         vapiInstance.on('call-end', () => {
@@ -79,21 +140,21 @@ export default function ChatWidget() {
           setIsConnecting(false)
           setStatusKey('')
           setVolumeLevel(0)
+          if (durationTimerRef.current) clearInterval(durationTimerRef.current)
         })
 
         vapiInstance.on('speech-start', () => { 
           setStatusKey('speaking')
-          setUserTranscript('') // Clear user transcript when AI starts talking
+          setUserTranscript('')
         })
 
         vapiInstance.on('speech-end', () => { 
-          setStatusKey('thinking') // AI is processing user input
+          setStatusKey('thinking')
         })
 
         vapiInstance.on('volume-level', (level: number) => setVolumeLevel(level))
 
         vapiInstance.on('message', (msg: any) => {
-          // Capture live transcripts to show on screen
           if (msg.type === 'transcript') {
             if (msg.role === 'user') {
               setStatusKey('listening')
@@ -119,8 +180,24 @@ export default function ChatWidget() {
 
     return () => { 
       if (vapiInstance) vapiInstance.stop() 
+      if (durationTimerRef.current) clearInterval(durationTimerRef.current)
     }
   }, [publicKey])
+
+  /* ─── Waveform Simulation based on Volume ─── */
+  useEffect(() => {
+    if (isCallActive && statusKey !== 'thinking') {
+      const interval = setInterval(() => {
+        const newWaveform = Array(24).fill(0).map(() => 
+          (volumeLevel * 40) + (Math.random() * (volumeLevel > 0.05 ? 15 : 4))
+        );
+        setWaveformData(newWaveform);
+      }, 80);
+      return () => clearInterval(interval);
+    } else {
+      setWaveformData(Array(24).fill(0));
+    }
+  }, [isCallActive, volumeLevel, statusKey]);
 
   /* ─── Actions ─── */
   const toggleCall = useCallback(async () => {
@@ -148,237 +225,250 @@ export default function ChatWidget() {
 
   if (!publicKey || !assistantId) return null
 
-  /* ─── Computed UI ─── */
+  /* ─── Computed UI Helpers ─── */
   const isActive = isCallActive || isConnecting
-  const statusText = statusKey ? LABELS[statusKey] : ''
+  const statusText = statusKey ? LABELS[statusKey] : LABELS.tapToTalk
   
-  // Memoize orb styles to prevent recalculating complex strings on every volume frame
-  const orbStyles = useMemo(() => {
-    const scale = 1 + volumeLevel * 0.4
-    const isSpeaking = statusKey === 'speaking'
-    const isListening = statusKey === 'listening'
-    
-    const primary = isActive ? (isSpeaking ? COLORS.gold : isListening ? COLORS.listening : COLORS.speaking) : COLORS.gold
-    const secondary = isActive ? (isSpeaking ? COLORS.goldDark : isListening ? '#5b4ccc' : '#3a5ab0') : COLORS.goldDark
-    const intensity = isActive ? (isSpeaking ? 0.6 : isListening ? 0.45 : 0.25) : 0.15
+  const getStatusColor = () => {
+    if (statusKey === 'listening') return COLORS.listening;
+    if (statusKey === 'speaking') return COLORS.speaking;
+    if (statusKey === 'thinking') return COLORS.thinking;
+    return COLORS.textMuted;
+  };
 
-    return {
-      background: `radial-gradient(circle at 38% 38%, ${primary}, ${secondary}88, transparent)`,
-      boxShadow: `0 0 ${24 + volumeLevel * 50}px rgba(${COLORS.goldRgb},${intensity}), 0 0 ${50 + volumeLevel * 80}px rgba(${COLORS.goldRgb},${intensity * 0.35})`,
-      transform: `scale(${scale})`,
-      cursor: isConnecting ? 'wait' : 'pointer',
-    }
-  }, [isActive, statusKey, volumeLevel, isConnecting])
+  const activeColor = getStatusColor();
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
 
   return (
     <>
-      {/* ── floating trigger ── */}
+      {/* ── Floating Trigger Button ── */}
       {!open && (
-        <button onClick={() => setOpen(true)} aria-label="Snakk med Eirik — Arxon AI" className="eirik-trigger">
-          <div className="eirik-trigger-ring" />
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-            <line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" />
-          </svg>
+        <button 
+          onClick={() => setOpen(true)} 
+          aria-label="Snakk med Eirik" 
+          className="fixed bottom-6 right-6 z-[9999] w-14 h-14 rounded-full flex items-center justify-center border-none cursor-pointer"
+          style={{
+            background: `linear-gradient(145deg, ${COLORS.gold}, ${COLORS.goldDark})`,
+            boxShadow: `0 4px 24px rgba(239, 192, 123, 0.35)`,
+          }}
+        >
+          <div className="absolute inset-[-4px] rounded-full border-2 animate-ping" style={{ borderColor: 'rgba(239,192,123,0.3)', animationDuration: '3s' }} />
+          <Mic className="w-6 h-6 text-[#050510]" />
         </button>
       )}
 
-      {/* ── voice panel ── */}
-      {open && (
-        <div className="eirik-panel">
-          {/* header */}
-          <div className="eirik-header">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div className="eirik-avatar">E</div>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary, lineHeight: 1.2 }}>Eirik</div>
-                <div style={{ fontSize: 11, color: COLORS.textMuted, lineHeight: 1.2 }}>Arxon AI-assistent</div>
-              </div>
-            </div>
-            <button onClick={handleClose} aria-label="Lukk" className="eirik-close">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-          </div>
-
-          {/* orb area */}
-          <div className="eirik-orb-area">
-            <button
-              onClick={toggleCall}
-              disabled={isConnecting}
-              aria-label={isCallActive ? 'Avslutt samtale' : 'Start samtale'}
-              className="eirik-orb"
-              style={orbStyles}
-            >
-              {isConnecting ? (
-                <div className="eirik-spinner" />
-              ) : isCallActive ? (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="rgba(255,255,255,0.9)" stroke="none">
-                  <rect x="6" y="6" width="12" height="12" rx="2" />
-                </svg>
-              ) : (
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                  <line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" />
-                </svg>
-              )}
-            </button>
-
-            {/* status line */}
-            <div className="eirik-status" style={{
-              color: isActive ? (statusKey === 'speaking' ? COLORS.gold : COLORS.textPrimary) : COLORS.textMuted,
-            }}>
-              {isActive && (
-                <span className="eirik-status-dot" style={{
-                  background: statusKey === 'speaking' ? COLORS.gold : statusKey === 'listening' ? COLORS.listening : COLORS.speaking,
-                }} />
-              )}
-              {isActive ? statusText : LABELS.tapToTalk}
+      {/* ── Siri-style Voice Panel ── */}
+      <AnimatePresence>
+        {open && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="fixed bottom-5 right-5 z-[9999] w-[340px] max-w-[calc(100vw-24px)] h-[520px] rounded-3xl overflow-hidden flex flex-col shadow-2xl"
+            style={{ 
+              background: COLORS.bg,
+              border: `1px solid rgba(239, 192, 123, 0.1)`,
+              boxShadow: `0 20px 80px rgba(0,0,0,0.8), 0 0 40px rgba(239, 192, 123, 0.05)`
+            }}
+          >
+            {/* Ambient Particles */}
+            <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+              {particles.map(particle => (
+                <motion.div
+                  key={particle.id}
+                  className="absolute w-1 h-1 rounded-full"
+                  style={{
+                    left: particle.x,
+                    top: particle.y,
+                    opacity: particle.opacity,
+                    backgroundColor: activeColor
+                  }}
+                  animate={{ scale: [1, 1.5, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                />
+              ))}
             </div>
 
-            {/* Live Transcripts Display */}
-            {isActive && (userTranscript || assistantTranscript) && (
-              <div className="eirik-transcripts">
-                {userTranscript && <div className="eirik-transcript-user">"{userTranscript}"</div>}
-                {assistantTranscript && statusKey === 'speaking' && <div className="eirik-transcript-ai">{assistantTranscript}</div>}
-              </div>
-            )}
+            {/* Background Glow */}
+            <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
+              <motion.div
+                className="w-80 h-80 rounded-full blur-3xl"
+                style={{
+                  background: `radial-gradient(circle, ${activeColor}40, transparent 70%)`
+                }}
+                animate={{
+                  scale: isActive ? [1, 1.1, 1] : [0.9, 1, 0.9],
+                  opacity: isActive ? [0.4, 0.6, 0.4] : [0.1, 0.2, 0.1]
+                }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </div>
 
-            {/* end call button */}
-            {isCallActive && (
-              <button onClick={() => vapiRef.current?.stop()} className="eirik-end-call">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 2.59 3.4z" />
-                  <line x1="1" y1="1" x2="23" y2="23" />
-                </svg>
-                Avslutt
+            {/* Header */}
+            <div className="relative z-20 flex justify-between items-center p-5">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm" style={{ background: `linear-gradient(145deg, ${COLORS.gold}, ${COLORS.goldDark})`, color: COLORS.bg }}>
+                  E
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[15px] leading-tight" style={{ color: COLORS.textPrimary }}>Eirik</h3>
+                  <p className="text-xs" style={{ color: COLORS.textMuted }}>Arxon AI-assistent</p>
+                </div>
+              </div>
+              <button onClick={handleClose} className="p-2 rounded-full hover:bg-white/5 transition-colors" style={{ color: COLORS.textMuted }}>
+                <X className="w-5 h-5" />
               </button>
-            )}
-          </div>
+            </div>
 
-          {/* footer */}
-          <div className="eirik-footer">
-            Eirik bruker mikrofon for samtale. Ingen data lagres.
-          </div>
-        </div>
-      )}
+            {/* Main Interactive Area */}
+            <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-8 px-6">
+              
+              {/* Main Orb Button */}
+              <motion.div className="relative" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <button
+                  onClick={toggleCall}
+                  disabled={isConnecting}
+                  className="relative w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500 z-10"
+                  style={{
+                    background: isActive ? `radial-gradient(circle at 30% 30%, ${activeColor}33, transparent)` : 'rgba(255,255,255,0.03)',
+                    border: `2px solid ${isActive ? activeColor : 'rgba(255,255,255,0.1)'}`,
+                    boxShadow: isActive ? `0 0 30px ${activeColor}40, inset 0 0 20px ${activeColor}20` : 'none'
+                  }}
+                >
+                  <AnimatePresence mode="wait">
+                    {isConnecting || statusKey === 'thinking' ? (
+                      <motion.div key="processing" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}>
+                        <Loader2 className="w-10 h-10 animate-spin" style={{ color: activeColor }} />
+                      </motion.div>
+                    ) : statusKey === 'speaking' ? (
+                      <motion.div key="speaking" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}>
+                        <Volume2 className="w-10 h-10" style={{ color: activeColor }} />
+                      </motion.div>
+                    ) : isCallActive ? (
+                      <motion.div key="listening" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}>
+                        <Mic className="w-10 h-10" style={{ color: activeColor }} />
+                      </motion.div>
+                    ) : (
+                      <motion.div key="idle" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}>
+                        <Mic className="w-10 h-10" style={{ color: COLORS.textPrimary }} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </button>
 
-      <style>{`
-        .eirik-trigger {
-          position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-          width: 58px; height: 58px; border-radius: 50%; border: none;
-          background: linear-gradient(145deg, ${COLORS.gold}, ${COLORS.goldDark});
-          cursor: pointer; display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 4px 24px rgba(${COLORS.goldRgb},0.35);
-          transition: transform 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s;
-        }
-        .eirik-trigger:hover {
-          transform: scale(1.07); box-shadow: 0 6px 36px rgba(${COLORS.goldRgb},0.5);
-        }
-        .eirik-trigger-ring {
-          position: absolute; inset: -4px; border-radius: 50%;
-          border: 2px solid rgba(${COLORS.goldRgb},0.25);
-          animation: eirik-ping 2.5s cubic-bezier(0,0,.2,1) infinite;
-        }
+                {/* Pulse Rings */}
+                <AnimatePresence>
+                  {isActive && statusKey !== 'thinking' && (
+                    <>
+                      <motion.div
+                        className="absolute inset-0 rounded-full border-[1.5px] pointer-events-none"
+                        style={{ borderColor: activeColor }}
+                        initial={{ scale: 1, opacity: 0.5 }}
+                        animate={{ scale: 1.6, opacity: 0 }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                      />
+                      <motion.div
+                        className="absolute inset-0 rounded-full border-[1.5px] pointer-events-none"
+                        style={{ borderColor: activeColor }}
+                        initial={{ scale: 1, opacity: 0.3 }}
+                        animate={{ scale: 2, opacity: 0 }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 0.6 }}
+                      />
+                    </>
+                  )}
+                </AnimatePresence>
+              </motion.div>
 
-        .eirik-panel {
-          position: fixed; bottom: 20px; right: 20px; z-index: 9999;
-          width: 340px; max-width: calc(100vw - 24px); border-radius: 20px;
-          overflow: hidden; display: flex; flex-direction: column;
-          background: ${COLORS.bg}; border: 1px solid rgba(${COLORS.goldRgb},0.08);
-          box-shadow: 0 12px 60px rgba(0,0,0,0.7), 0 0 80px rgba(${COLORS.goldRgb},0.04);
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-          animation: eirik-slide-up 0.3s cubic-bezier(.4,0,.2,1);
-        }
+              {/* Status & Timer */}
+              <div className="flex flex-col items-center gap-1">
+                <motion.p 
+                  className="text-base font-medium"
+                  style={{ color: isActive ? activeColor : COLORS.textMuted }}
+                  animate={{ opacity: isActive ? [1, 0.7, 1] : 1 }}
+                  transition={{ duration: 2, repeat: isActive ? Infinity : 0 }}
+                >
+                  {statusText}
+                </motion.p>
+                {isCallActive && (
+                  <p className="text-xs font-mono" style={{ color: COLORS.textMuted }}>
+                    {formatTime(duration)}
+                  </p>
+                )}
+              </div>
 
-        .eirik-header {
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
-        }
-        .eirik-avatar {
-          width: 32px; height: 32px; border-radius: 10px;
-          background: linear-gradient(145deg, ${COLORS.gold}, ${COLORS.goldDark});
-          display: flex; align-items: center; justify-content: center;
-          font-size: 14px; font-weight: 700; color: ${COLORS.bg}; flex-shrink: 0;
-        }
-        .eirik-close {
-          background: none; border: none; color: ${COLORS.textMuted}; cursor: pointer;
-          padding: 6px; border-radius: 8px; display: flex; transition: all 0.15s;
-        }
-        .eirik-close:hover { color: ${COLORS.textPrimary}; background: rgba(255,255,255,0.05); }
+              {/* Waveform Visualizer */}
+              <div className="flex items-end justify-center gap-[3px] h-12 w-full mt-2">
+                {waveformData.map((height, i) => (
+                  <motion.div
+                    key={i}
+                    className="w-1 rounded-full transition-all duration-75"
+                    style={{ backgroundColor: isActive ? activeColor : 'transparent' }}
+                    animate={{ 
+                      height: isActive ? `${Math.max(4, height)}px` : '4px',
+                      opacity: isActive ? 0.8 : 0
+                    }}
+                  />
+                ))}
+              </div>
 
-        .eirik-orb-area {
-          display: flex; flex-direction: column; align-items: center;
-          padding: 28px 16px 20px; gap: 14px;
-        }
-        .eirik-orb {
-          width: 96px; height: 96px; border-radius: 50%; border: none;
-          display: flex; align-items: center; justify-content: center;
-          transition: transform 0.12s ease, box-shadow 0.3s ease, background 0.4s ease;
-          position: relative;
-        }
-        .eirik-orb::before {
-          content: ''; position: absolute; inset: -6px; border-radius: 50%;
-          border: 1.5px solid rgba(${COLORS.goldRgb},0.1); transition: border-color 0.3s;
-        }
-        .eirik-orb:hover::before { border-color: rgba(${COLORS.goldRgb},0.2); }
+              {/* Live Transcripts */}
+              <div className="w-full text-center min-h-[40px] flex flex-col justify-end">
+                <AnimatePresence mode="wait">
+                  {userTranscript && statusKey === 'listening' && (
+                    <motion.div 
+                      key="user"
+                      initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
+                      className="text-sm italic" style={{ color: COLORS.textMuted }}
+                    >
+                      "{userTranscript}"
+                    </motion.div>
+                  )}
+                  {assistantTranscript && statusKey === 'speaking' && (
+                    <motion.div 
+                      key="ai"
+                      initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
+                      className="text-[15px] font-medium leading-snug" style={{ color: COLORS.textPrimary }}
+                    >
+                      {assistantTranscript}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
 
-        .eirik-status {
-          font-size: 13px; text-align: center; min-height: 18px;
-          transition: color 0.2s; display: flex; align-items: center; gap: 6px;
-        }
-        .eirik-status-dot {
-          width: 6px; height: 6px; border-radius: 50%; display: inline-block;
-          animation: eirik-pulse-dot 1.5s ease-in-out infinite;
-        }
-        
-        .eirik-transcripts {
-          width: 100%; text-align: center; padding: 0 10px; 
-          display: flex; flex-direction: column; gap: 4px;
-          animation: eirik-fade-in 0.3s ease;
-        }
-        .eirik-transcript-user {
-          font-size: 12px; color: ${COLORS.textMuted}; font-style: italic;
-        }
-        .eirik-transcript-ai {
-          font-size: 13px; color: ${COLORS.textPrimary}; font-weight: 500;
-        }
+            {/* Footer */}
+            <div className="relative z-20 p-5 flex flex-col items-center gap-4 border-t border-white/5 bg-[#050510]/80 backdrop-blur-md">
+              {isCallActive && (
+                <button 
+                  onClick={() => vapiRef.current?.stop()}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-colors hover:bg-red-500/20"
+                  style={{ color: '#f87171', backgroundColor: 'rgba(239, 68, 68, 0.1)' }}
+                >
+                  <MicOff className="w-4 h-4" />
+                  Avslutt samtale
+                </button>
+              )}
+              
+              <motion.div 
+                className="flex items-center gap-1.5 text-xs" 
+                style={{ color: COLORS.textMuted }}
+                animate={{ opacity: [0.6, 1, 0.6] }}
+                transition={{ duration: 4, repeat: Infinity }}
+              >
+                <Sparkles className="w-3.5 h-3.5" style={{ color: COLORS.goldDark }} />
+                <span>Drevet av Arxon AI</span>
+              </motion.div>
+            </div>
 
-        .eirik-end-call {
-          display: flex; align-items: center; gap: 6px; padding: 6px 14px;
-          border-radius: 20px; border: 1px solid rgba(239,68,68,0.25);
-          background: rgba(239,68,68,0.08); color: #f87171;
-          font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; font-family: inherit;
-        }
-        .eirik-end-call:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); }
-
-        .eirik-footer {
-          padding: 0 16px 10px; text-align: center; font-size: 9.5px; color: rgba(255,255,255,0.16); line-height: 1.4;
-        }
-        .eirik-spinner {
-          width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.12);
-          border-top: 2px solid rgba(255,255,255,0.85); border-radius: 50%;
-          animation: eirik-spin 0.7s linear infinite;
-        }
-
-        @keyframes eirik-spin { to { transform: rotate(360deg); } }
-        @keyframes eirik-slide-up { from { opacity: 0; transform: translateY(12px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        @keyframes eirik-ping { 0% { transform: scale(1); opacity: 0.6; } 75%, 100% { transform: scale(1.35); opacity: 0; } }
-        @keyframes eirik-pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        @keyframes eirik-fade-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-
-        @media (max-width: 480px) {
-          .eirik-panel { bottom: 12px !important; right: 12px !important; width: calc(100vw - 24px) !important; max-width: 340px !important; border-radius: 18px !important; }
-          .eirik-trigger { bottom: 16px !important; right: 16px !important; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .eirik-trigger-ring, .eirik-panel, .eirik-status-dot, .eirik-transcripts { animation: none !important; }
-          .eirik-trigger:hover { transform: none; }
-        }
-      `}</style>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }
