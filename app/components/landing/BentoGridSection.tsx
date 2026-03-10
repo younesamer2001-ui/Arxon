@@ -17,58 +17,61 @@ export function BentoGridSection() {
   const { lang } = useLanguage()
   const no = lang === 'no'
 
+  const features = no ? [
+    { icon: <Bot size={18} />, title: 'AI-Mobilsvarer' },
+    { icon: <CalendarCheck size={18} />, title: 'Automatisk booking' },
+    { icon: <Users size={18} />, title: 'Kundeoppfølging' },
+    { icon: <BarChart3 size={18} />, title: 'Lead-kvalifisering' },
+    { icon: <Cog size={18} />, title: 'Automatisert admin' },
+    { icon: <Megaphone size={18} />, title: 'Smart markedsføring' },
+  ] : [
+    { icon: <Bot size={18} />, title: 'AI Phone Answering' },
+    { icon: <CalendarCheck size={18} />, title: 'Automatic booking' },
+    { icon: <Users size={18} />, title: 'Customer follow-up' },
+    { icon: <BarChart3 size={18} />, title: 'Lead qualification' },
+    { icon: <Cog size={18} />, title: 'Automated admin' },
+    { icon: <Megaphone size={18} />, title: 'Smart marketing' },
+  ]
+
   return (
-    <section className="py-14 md:py-28" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
-      <div className="max-w-5xl mx-auto px-5">
-        <motion.div {...sAnim} className="text-center mb-10 md:mb-14">
-          <h2 className="text-[28px] md:text-[42px] font-bold tracking-tight mb-4" style={{ color: '#f4f1eb' }}>
+    <section className="py-10 md:py-20" style={{ borderTop: '1px solid rgba(244,241,235,0.04)' }}>
+      <div className="max-w-4xl mx-auto px-5">
+        <motion.div {...sAnim} className="text-center mb-8 md:mb-12">
+          <h2 className="text-[24px] md:text-[36px] font-bold tracking-tight mb-3" style={{ color: '#f4f1eb' }}>
             {no ? 'Alt du trenger —' : 'Everything you need —'} <span className="text-gradient-gold">{no ? 'én plattform' : 'one platform'}</span>
           </h2>
-          <p className="text-[15px] max-w-lg mx-auto" style={{ color: 'rgba(244,241,235,0.6)' }}>
-            {no ? 'Arxon erstatter manuelt arbeid med intelligente AI-systemer som jobber 24/7.' : 'Arxon replaces manual work with intelligent AI systems that work 24/7.'}
+          <p className="text-[14px] max-w-md mx-auto" style={{ color: 'rgba(244,241,235,0.55)' }}>
+            {no ? 'Arxon erstatter manuelt arbeid med AI som jobber 24/7.' : 'Arxon replaces manual work with AI that works 24/7.'}
           </p>
         </motion.div>
 
-        <div className="bento-grid">
-          {(no ? [
-            { icon: <Bot size={22} />, title: 'AI-Mobilsvarer', desc: 'Svarer telefonen 24/7. Kvalifiserer leads, booker møter og sender sammendrag — alt automatisk.', span: 'wide' },
-            { icon: <CalendarCheck size={22} />, title: 'Automatisk booking', desc: 'Kundene booker direkte i kalenderen din. Ingen frem-og-tilbake på SMS.', span: 'normal' },
-            { icon: <Users size={22} />, title: 'Kundeoppfølging', desc: 'AI følger opp leads med personlige meldinger til riktig tid.', span: 'normal' },
-            { icon: <BarChart3 size={22} />, title: 'Lead-kvalifisering', desc: 'Rangerer og sorterer leads basert på kjøpssannsynlighet. Du ringer bare de varme.', span: 'normal' },
-            { icon: <Cog size={22} />, title: 'Automatisert admin', desc: 'Fakturering, rapporter og oppgaver kjører av seg selv.', span: 'normal' },
-            { icon: <Megaphone size={22} />, title: 'Smart markedsføring', desc: 'AI-drevne kampanjer som treffer riktig kunde til riktig tid.', span: 'wide' },
-          ] : [
-            { icon: <Bot size={22} />, title: 'AI Phone Answering', desc: 'Answers the phone 24/7. Qualifies leads, books meetings, and sends summaries — all automatically.', span: 'wide' },
-            { icon: <CalendarCheck size={22} />, title: 'Automatic booking', desc: 'Customers book directly in your calendar. No back-and-forth via SMS.', span: 'normal' },
-            { icon: <Users size={22} />, title: 'Customer follow-up', desc: 'AI follows up leads with personalized messages at the right time.', span: 'normal' },
-            { icon: <BarChart3 size={22} />, title: 'Lead qualification', desc: 'Ranks and sorts leads by purchase likelihood. You only call the warm ones.', span: 'normal' },
-            { icon: <Cog size={22} />, title: 'Automated admin', desc: 'Invoicing, reports, and tasks run by themselves.', span: 'normal' },
-            { icon: <Megaphone size={22} />, title: 'Smart marketing', desc: 'AI-driven campaigns that reach the right customer at the right time.', span: 'wide' },
-          ]).map((item, i) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+          {features.map((item, i) => (
             <motion.div key={i}
-              initial={{ opacity: 0, y: 20, scale: 0.98 }}
+              initial={{ opacity: 0, y: 16, scale: 0.95 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.08 }}
-              className={`bento-card group ${item.span === 'wide' ? 'md:col-span-2' : ''}`}
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              transition={{ duration: 0.35, delay: i * 0.06 }}
+              whileHover={{ y: -3, borderColor: `rgba(${goldRgb},0.3)`, transition: { duration: 0.2 } }}
+              className="flex items-center gap-3 px-4 py-3.5 md:px-5 md:py-4 rounded-xl cursor-default"
+              style={{
+                background: 'rgba(13, 26, 45, 0.35)',
+                border: `1px solid rgba(${goldRgb},0.1)`,
+                backdropFilter: 'blur(8px)',
+              }}
             >
-              <div className="bento-card-glow" />
-              <div className="relative z-10 p-6 md:p-8">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
-                  style={{ background: `rgba(${goldRgb},0.08)`, border: `1px solid rgba(${goldRgb},0.15)` }}>
-                  <span style={{ color: gold }}>{item.icon}</span>
-                </div>
-                <h3 className="text-[16px] font-bold mb-2" style={{ color: '#f4f1eb' }}>{item.title}</h3>
-                <p className="text-[14px] leading-relaxed" style={{ color: 'rgba(244,241,235,0.65)' }}>{item.desc}</p>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: `rgba(${goldRgb},0.1)`, border: `1px solid rgba(${goldRgb},0.15)` }}>
+                <span style={{ color: gold }}>{item.icon}</span>
               </div>
+              <span className="text-[13px] md:text-[14px] font-semibold" style={{ color: '#f4f1eb' }}>{item.title}</span>
             </motion.div>
           ))}
         </div>
 
-        <motion.div {...sAnim} className="text-center mt-10">
-          <Link href="/tjenester" className="inline-flex items-center gap-2 text-[14px] font-medium" style={{ color: gold, textDecoration: 'none' }}>
-            {no ? 'Se alle 75+ automatiseringer' : 'See all 75+ automations'} <ArrowUpRight size={15} />
+        <motion.div {...sAnim} className="text-center mt-6">
+          <Link href="/tjenester" className="inline-flex items-center gap-1.5 text-[13px] font-medium" style={{ color: gold, textDecoration: 'none' }}>
+            {no ? 'Se alle 75+ automatiseringer' : 'See all 75+ automations'} <ArrowUpRight size={14} />
           </Link>
         </motion.div>
       </div>
