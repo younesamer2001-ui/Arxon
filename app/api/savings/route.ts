@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
     const { data: order } = await supabase
       .from('orders')
       .select('*')
-      .eq('customer_id', customerId)
+      .eq('id', customerId)
       .single()
 
     if (!order) {
