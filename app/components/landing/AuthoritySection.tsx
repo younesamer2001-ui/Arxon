@@ -19,13 +19,16 @@ const statIcons = [TrendingUp, Shield, Zap, Clock]
 function TestimonialCard({ t, i }: { t: { name: string; biz: string; quote: string; result: string; stars: number }; i: number }) {
   return (
     <div
-      className="relative group rounded-2xl overflow-hidden flex-shrink-0 w-[320px] md:w-[380px]"
+      className="relative group rounded-2xl overflow-hidden flex-shrink-0 w-[320px] md:w-[380px] transition-all duration-300 hover:scale-[1.03] hover:-translate-y-1"
       style={{
         background: 'rgba(13, 26, 45, 0.5)',
         border: `1px solid rgba(${goldRgb},0.08)`,
         backdropFilter: 'blur(10px)',
       }}
     >
+      {/* Hover glow overlay */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl"
+        style={{ boxShadow: `inset 0 0 30px rgba(${goldRgb},0.06), 0 8px 32px rgba(${goldRgb},0.08)` }} />
       {/* Gold left border accent */}
       <div className="absolute left-0 top-0 bottom-0 w-[2px]"
         style={{ background: `linear-gradient(180deg, ${gold}, rgba(${goldRgb},0.08))` }} />
@@ -74,15 +77,15 @@ export function AuthoritySection() {
   const no = lang === 'no'
 
   const stats = no ? [
-    { val: 200, suffix: '+', label: 'Automatiseringer' },
-    { val: 5, suffix: '', label: 'Bransjer dekket' },
-    { val: 85, suffix: '%', label: 'Raskere oppfølging' },
-    { val: 24, suffix: '/7', label: 'AI tilgjengelig' },
+    { val: 200, suffix: '+', label: 'Automatiseringer', desc: 'Bygget og levert for norske bedrifter' },
+    { val: 5, suffix: '', label: 'Bransjer dekket', desc: 'Bygg, salong, eiendom, verksted & mer' },
+    { val: 85, suffix: '%', label: 'Raskere oppfølging', desc: 'Gjennomsnittlig responstid forbedring' },
+    { val: 24, suffix: '/7', label: 'AI tilgjengelig', desc: 'Aldri gå glipp av en kunde igjen' },
   ] : [
-    { val: 200, suffix: '+', label: 'Automations' },
-    { val: 5, suffix: '', label: 'Industries covered' },
-    { val: 85, suffix: '%', label: 'Faster follow-up' },
-    { val: 24, suffix: '/7', label: 'AI available' },
+    { val: 200, suffix: '+', label: 'Automations', desc: 'Built and delivered for Norwegian businesses' },
+    { val: 5, suffix: '', label: 'Industries covered', desc: 'Construction, salon, real estate & more' },
+    { val: 85, suffix: '%', label: 'Faster follow-up', desc: 'Average response time improvement' },
+    { val: 24, suffix: '/7', label: 'AI available', desc: 'Never miss a customer again' },
   ]
 
   const testimonials = no ? [
@@ -103,7 +106,7 @@ export function AuthoritySection() {
       <style>{`
         @keyframes marquee {
           0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+          100% { transform: translateX(-33.333%); }
         }
         .marquee-track {
           animation: marquee 35s linear infinite;
@@ -158,6 +161,7 @@ export function AuthoritySection() {
                     <AnimCounter target={s.val} suffix={s.suffix} />
                   </div>
                   <div className="text-[11px] tracking-wider uppercase mt-2 font-medium" style={{ color: 'rgba(244,241,235,0.45)' }}>{s.label}</div>
+                  <div className="text-[10px] mt-1.5 leading-snug" style={{ color: 'rgba(244,241,235,0.3)' }}>{s.desc}</div>
                 </motion.div>
               )
             })}
@@ -181,9 +185,9 @@ export function AuthoritySection() {
           style={{ background: 'linear-gradient(270deg, #050510, transparent)' }} />
 
         <div className="marquee-track flex gap-5" style={{ width: 'max-content' }}>
-          {/* Duplicate testimonials for seamless loop */}
-          {[...testimonials, ...testimonials].map((t, i) => (
-            <TestimonialCard key={i} t={t} i={i} />
+          {/* Triple testimonials for seamless loop */}
+          {[...testimonials, ...testimonials, ...testimonials].map((t, i) => (
+            <TestimonialCard key={i} t={t} i={i % testimonials.length} />
           ))}
         </div>
       </motion.div>
