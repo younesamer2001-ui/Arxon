@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Sparkles, Star, Building2, Clock, Filter, Eye, CheckCircle2, XCircle, MessageSquare, AlertCircle } from 'lucide-react'
 
@@ -58,7 +59,7 @@ export default function AdminPage() {
     return (
       <div style={{ minHeight: '100vh', background: '#050510', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'DM Sans', sans-serif" }}>
         <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 18, padding: '40px 36px', maxWidth: 380, width: '100%', textAlign: 'center' }}>
-          <img src="/arxon-icon.png" alt="Arxon" style={{ width: 40, height: 40, margin: '0 auto 16px' }} />
+          <div style={{ margin: '0 auto 16px', width: 40, height: 40 }}><Image src="/arxon-icon.png" alt="Arxon" width={40} height={40} /></div>
           <h2 style={{ color: '#f0f0f0', fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Admin</h2>
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, marginBottom: 24 }}>Skriv inn passord for å fortsette</p>
           <input

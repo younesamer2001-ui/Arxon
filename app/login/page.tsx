@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { signIn, signUp } from '@/lib/auth'
 import { gold, goldRgb, bg, fonts } from '@/lib/constants'
 import { Mail, Lock, ArrowLeft, ArrowRight, Eye, EyeOff } from 'lucide-react'
@@ -87,7 +88,7 @@ export default function LoginPage() {
           padding: '40px 32px',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-            <img src="/arxon-icon.png" alt="Arxon" style={{ width: 32, height: 32 }} />
+            <Image src="/arxon-icon.png" alt="Arxon" width={32} height={32} />
             <span style={{ color: '#f0f0f0', fontSize: 18, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>
               Arxon
             </span>

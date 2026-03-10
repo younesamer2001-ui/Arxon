@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { gold, goldRgb, bg, fonts } from '@/lib/constants'
 import {
   LayoutDashboard, Phone, Users, CalendarCheck, Settings,
@@ -98,7 +99,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           justifyContent: 'space-between',
         }}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-            <img src="/arxon-icon.png" alt="Arxon" style={{ width: 28, height: 28 }} />
+            <Image src="/arxon-icon.png" alt="Arxon" width={28} height={28} />
             <span style={{
               color: '#f0f0f0', fontSize: 15, fontWeight: 700,
               letterSpacing: '2px', textTransform: 'uppercase',

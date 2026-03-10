@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { gold, goldRgb, fonts } from '@/lib/constants'
 import { useLanguage } from '@/lib/language-context'
 
@@ -72,7 +73,7 @@ export default function Footer({ minimal = false }: FooterProps) {
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 280 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <img src="/arxon-icon.png" alt="Arxon" style={{ width: 24, height: 24 }} />
+            <Image src="/arxon-icon.png" alt="Arxon" width={24} height={24} loading="lazy" />
             <span style={{
               fontSize: 14, color: 'rgba(255,255,255,0.5)', fontWeight: 700,
               letterSpacing: '2px', textTransform: 'uppercase' as const,

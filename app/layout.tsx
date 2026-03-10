@@ -1,7 +1,15 @@
 import type { Metadata, Viewport } from 'next'
+import { Inter } from 'next/font/google'
 import dynamic from 'next/dynamic'
 import { LanguageProvider } from '@/lib/language-context'
 import './globals.css'
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-inter',
+})
 
 const ChatWidget = dynamic(() => import('./components/ChatWidget'), { ssr: false })
 const CookieConsent = dynamic(() => import('./components/CookieConsent'), { ssr: false })
@@ -147,7 +155,7 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="no" className="dark" suppressHydrationWarning>
+    <html lang="no" className={`dark ${inter.variable}`} suppressHydrationWarning>
       <head>
         {/* Google Analytics - DISABLED - TODO: Add GA measurement ID when Google account is created */}
         {/* <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX" />

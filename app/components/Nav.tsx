@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight, Globe, Menu, X } from 'lucide-react'
 import { gold, goldRgb, bg, fonts } from '@/lib/constants'
 import { useLanguage } from '@/lib/language-context'
@@ -60,7 +61,7 @@ export default function Nav({ sticky = false }: NavProps) {
       <nav style={navStyle}>
         <div style={innerStyle}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-            <img src="/arxon-icon.png" alt="Arxon" style={{ width: sticky ? 28 : 34, height: sticky ? 28 : 34 }} />
+            <Image src="/arxon-icon.png" alt="Arxon" width={sticky ? 28 : 34} height={sticky ? 28 : 34} priority />
             <span style={{
               fontFamily: fonts.body,
               fontSize: sticky ? 16 : 20,

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Globe, Menu, X } from 'lucide-react';
 
@@ -745,7 +746,7 @@ export default function AINorge2025() {
         <nav>
           <div className="nav-container">
             <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-              <img src="/arxon-icon.png" alt="Arxon" style={{ width: 28, height: 28 }} />
+              <Image src="/arxon-icon.png" alt="Arxon" width={28} height={28} />
               <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#f0f0f0' }}>Arxon</span>
             </Link>
             <div className="nav-links hide-mobile">
@@ -788,7 +789,7 @@ export default function AINorge2025() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 64, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
               <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-                <img src="/arxon-icon.png" alt="Arxon" style={{ width: 34, height: 34 }} />
+                <Image src="/arxon-icon.png" alt="Arxon" width={34} height={34} />
                 <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 20, fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase', color: '#f0f0f0' }}>Arxon</span>
               </Link>
               <button onClick={() => setMenuOpen(false)} style={{
@@ -952,7 +953,7 @@ export default function AINorge2025() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 32, marginBottom: 32 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 280 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <img src="/arxon-icon.png" alt="Arxon" style={{ width: 24, height: 24 }} />
+                <Image src="/arxon-icon.png" alt="Arxon" width={24} height={24} loading="lazy" />
                 <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>Arxon</span>
               </div>
               <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', lineHeight: 1.6 }}>
