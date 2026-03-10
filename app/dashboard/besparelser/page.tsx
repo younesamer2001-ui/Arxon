@@ -101,7 +101,7 @@ export default function BesparelserPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontFamily: fonts
+        fontFamily: fonts.body
       }}>
         <div style={{ textAlign: 'center' }}>
           <Loader2
@@ -123,7 +123,7 @@ export default function BesparelserPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontFamily: fonts
+        fontFamily: fonts.body
       }}>
         <div style={{
           background: 'rgba(255,59,48,0.1)',
@@ -176,7 +176,7 @@ export default function BesparelserPage() {
       minHeight: '100vh',
       background: bg,
       padding: '32px 24px',
-      fontFamily: fonts
+      fontFamily: fonts.body
     }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         {/* Header */}
