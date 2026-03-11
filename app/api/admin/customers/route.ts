@@ -23,6 +23,37 @@ export async function GET() {
   }
 }
 
+export async function POST(req: Request) {
+  try {
+    const body = await req.json()
+    const { company_name, contact_person, email, phone } = body
+
+    if (!company_name || !email) {
+      return NextResponse.json({ error: 'Mangler company_name eller email' }, { status: 400 })
+    }
+
+    const { data, error } = await supabase
+      .from('customers')
+      .insert({
+        company_name,
+        contact_person: contact_person || null,
+        email,
+        phone: phone || null,
+        onboarding_status: 'pending',
+      })
+      .select()
+      .single()
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ customer: data })
+  } catch (err) {
+    return NextResponse.json({ error: 'Intern serverfeil' }, { status: 500 })
+  }
+}
+
 export async function PATCH(req: Request) {
   try {
     const body = await req.json()
