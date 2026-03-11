@@ -6,6 +6,7 @@ import { motion, MotionValue } from 'framer-motion'
 import { ArrowRight, Shield } from 'lucide-react'
 import { gold, goldRgb } from '@/lib/constants'
 import { useLanguage } from '@/lib/language-context'
+import { useGeo } from '@/lib/geo-context'
 import { useCalBooking } from '@/lib/useCalBooking'
 
 declare global {
@@ -30,7 +31,13 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
   const router = useRouter()
   const { lang } = useLanguage()
   const no = lang === 'no'
+  const { geo } = useGeo()
   const openBooking = useCalBooking()
+
+  // City-personalised solution line
+  const cityTag = geo.city && geo.country === 'NO'
+    ? (no ? `for bedrifter i ${geo.city}` : `for businesses in ${geo.city}`)
+    : null
 
   const ctaClick = useCallback(() => {
     trackEvent('CTA_Click', { button_text: 'Finn dine 20 timer', section: 'hero' })
@@ -96,8 +103,8 @@ export function HeroSection({ heroRef, heroTextY, heroOpacity }: HeroSectionProp
           style={{ color: 'rgba(244,241,235,0.5)' }}
         >
           {no
-            ? 'Telefon, booking, oppfølging, admin, markedsføring — Arxon automatiserer det som bremser bedriften din. 75+ ferdige løsninger. Klar på 14 dager.'
-            : 'Phone, booking, follow-up, admin, marketing — Arxon automates what slows your business down. 75+ ready-made solutions. Ready in 14 days.'}
+            ? `Telefon, booking, oppfølging, admin, markedsføring — Arxon automatiserer det som bremser bedriften din.${cityTag ? ` Skreddersydd ${cityTag}.` : ''} 75+ ferdige løsninger. Klar på 14 dager.`
+            : `Phone, booking, follow-up, admin, marketing — Arxon automates what slows your business down.${cityTag ? ` Tailored ${cityTag}.` : ''} 75+ ready-made solutions. Ready in 14 days.`}
         </motion.p>
 
         {/* ── CTAs — curiosity-driven ── */}

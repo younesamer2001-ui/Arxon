@@ -48,11 +48,10 @@ function isRateLimited(ip: string): boolean {
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
-  // Only apply rate limiting and CORS to API routes
+  // ── API routes: rate limiting + CORS ──
   if (pathname.startsWith('/api/')) {
     const ip = getClientIp(request)
 
-    // Check rate limit
     if (isRateLimited(ip)) {
       return NextResponse.json(
         { error: 'Too many requests' },
@@ -60,7 +59,6 @@ export function middleware(request: NextRequest) {
       )
     }
 
-    // Add CORS headers for API routes
     const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'https://arxon.no').split(',').map(o => o.trim())
     const origin = request.headers.get('origin') || ''
     const response = NextResponse.next()
@@ -84,11 +82,48 @@ export function middleware(request: NextRequest) {
     return response
   }
 
-  // Allow all non-API routes
-  return NextResponse.next()
+  // ── Page routes: geo detection via Vercel headers ──
+  const response = NextResponse.next()
+
+  // Vercel automatically injects these headers on their edge network
+  const city = request.headers.get('x-vercel-ip-city')
+  const country = request.headers.get('x-vercel-ip-country')
+  const region = request.headers.get('x-vercel-ip-country-region')
+
+  // Set lightweight cookies so client components can read geo data
+  // Only set if we have data and the cookie isn't already set (avoid re-setting on every request)
+  if (city) {
+    response.cookies.set('arxon-geo-city', decodeURIComponent(city), {
+      path: '/',
+      maxAge: 60 * 60 * 24, // 24 hours
+      sameSite: 'lax',
+      httpOnly: false, // client needs to read it
+    })
+  }
+  if (country) {
+    response.cookies.set('arxon-geo-country', country, {
+      path: '/',
+      maxAge: 60 * 60 * 24,
+      sameSite: 'lax',
+      httpOnly: false,
+    })
+  }
+  if (region) {
+    response.cookies.set('arxon-geo-region', region, {
+      path: '/',
+      maxAge: 60 * 60 * 24,
+      sameSite: 'lax',
+      httpOnly: false,
+    })
+  }
+
+  return response
 }
 
-// Configure which routes use this middleware
+// Match both API routes (rate limiting) and page routes (geo detection)
 export const config = {
-  matcher: ['/api/:path*'],
+  matcher: [
+    '/api/:path*',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|css|js)).*)',
+  ],
 }

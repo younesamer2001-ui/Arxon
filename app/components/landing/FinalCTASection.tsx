@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import { gold, goldRgb } from '@/lib/constants'
 import { useLanguage } from '@/lib/language-context'
+import { useGeo } from '@/lib/geo-context'
 import { useCalBooking } from '@/lib/useCalBooking'
 
 declare global {
@@ -31,6 +32,11 @@ export function FinalCTASection() {
   const router = useRouter()
   const { lang } = useLanguage()
   const no = lang === 'no'
+  const { geo } = useGeo()
+
+  const cityTag = geo.city && geo.country === 'NO'
+    ? (no ? `i ${geo.city}` : `in ${geo.city}`)
+    : null
 
   const openBooking = useCalBooking()
 
@@ -60,7 +66,9 @@ export function FinalCTASection() {
             <span className="text-gradient-gold anim-gradient-shift">{no ? 'Start i dag.' : 'Start today.'}</span>
           </motion.h2>
           <p className="text-[15px] mb-8 max-w-md mx-auto" style={{ color: 'rgba(244,241,235,0.6)' }}>
-            {no ? 'Gratis kartlegging. Ingen binding. Implementert på ca. 14 dager.' : 'Free assessment. No commitment. Implemented in ~14 days.'}
+            {no
+              ? `Gratis kartlegging. Ingen binding. Implementert på ca. 14 dager.${cityTag ? ` Lokalt tilpasset ${cityTag}.` : ''}`
+              : `Free assessment. No commitment. Implemented in ~14 days.${cityTag ? ` Locally tailored ${cityTag}.` : ''}`}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
             <button onClick={ctaClick} className="gold-btn gold-btn-pulse rounded-xl py-4 px-12 text-[16px] font-bold inline-flex items-center gap-2 group">
