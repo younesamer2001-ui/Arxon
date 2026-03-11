@@ -1,17 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/lib/auth-context'
+import { getCustomer, getLeads } from '@/lib/dashboard'
 import { gold, goldRgb, fonts } from '@/lib/constants'
 import { Search, Star, Phone, Mail, Building2, MapPin, ChevronDown, ChevronUp } from 'lucide-react'
 
-const demoLeads = [
-  { id: 1, name: 'Ole Hansen', company: 'Hansen Bilservice', phone: '+47 912 34 567', email: 'ole@hansenbs.no', industry: 'Bilverksted', location: 'Bergen', score: 9, status: 'hot', source: 'AI-telefonsvarer', date: '28. feb 2026', notes: 'Bilverksted med 8 ansatte. Taper 10+ anrop daglig. Svært interessert i mobilsvarer + auto-booking. Har budsjett. Følg opp innen 24t.' },
-  { id: 2, name: 'Maria Solberg', company: 'Salong Bella', phone: '+47 555 12 345', email: 'maria@salongbella.no', industry: 'Salong & Skjønnhet', location: 'Oslo', score: 8, status: 'hot', source: 'AI-telefonsvarer', date: '28. feb 2026', notes: 'Salong med 5 ansatte. Bruker 2-3 timer daglig på telefon for timebestilling. Vil ha auto-booking + påminnelser. Klar for demo.' },
-  { id: 3, name: 'Per Johansen', company: 'Byggmester AS', phone: '+47 444 33 222', email: 'per@byggmester.no', industry: 'Bygg & Håndverk', location: 'Trondheim', score: 9, status: 'hot', source: 'AI-telefonsvarer', date: '28. feb 2026', notes: '12 ansatte. Taper mange anrop på byggeplasser. Ønsker AI-mobilsvarer + CRM-integrasjon. Stor kunde-potensial.' },
-  { id: 4, name: 'Anne Kristiansen', company: 'Fjordreiser AS', phone: '+47 666 55 444', email: 'anne@fjordreiser.no', industry: 'Reiseliv & Overnatting', location: 'Stavanger', score: 7, status: 'warm', source: 'Nettside', date: '27. feb 2026', notes: 'Reisebyrå med booking-utfordringer. Ønsker auto-svar på vanlige spørsmål + booking-system. Litt usikker på budsjett.' },
-  { id: 5, name: 'Thomas Berg', company: 'Berg Eiendom', phone: '+47 888 77 666', email: 'thomas@bergeiendom.no', industry: 'Eiendomsmegling', location: 'Oslo', score: 6, status: 'warm', source: 'Kartlegging', date: '26. feb 2026', notes: 'Eiendomsmegler med 3 ansatte. Vil automatisere visningspåmelding og oppfølging av leads. Tidlig fase.' },
-  { id: 6, name: 'Lisa Strand', company: 'Strand Dekk & Felg', phone: '+47 999 11 222', email: 'lisa@stranddf.no', industry: 'Bilverksted', location: 'Drammen', score: 5, status: 'cold', source: 'AI-telefonsvarer', date: '25. feb 2026', notes: 'Liten bedrift, 2 ansatte. Interessert men begrenset budsjett. Kan være aktuell for startpakke.' },
-]
+interface LeadRecord {
+  id: string
+  name: string | null
+  company: string | null
+  phone: string | null
+  email: string | null
+  industry: string | null
+  location: string | null
+  score: number | null
+  status: string | null
+  source: string | null
+  notes: string | null
+  created_at: string
+}
 
 const statusConfig: Record<string, { label: string, bg: string, color: string }> = {
   hot: { label: 'Varm', bg: 'rgba(248,113,113,0.12)', color: '#f87171' },
@@ -19,16 +27,49 @@ const statusConfig: Record<string, { label: string, bg: string, color: string }>
   cold: { label: 'Kald', bg: 'rgba(96,165,250,0.12)', color: '#60a5fa' },
 }
 
+function formatDate(dateStr: string) {
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
 export default function LeadsPage() {
+  const { user } = useAuth()
+  const [leads, setLeads] = useState<LeadRecord[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState<'all' | 'hot' | 'warm' | 'cold'>('all')
-  const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
 
-  const filtered = demoLeads.filter(l => {
-    if (filterStatus !== 'all' && l.status !== filterStatus) return false
+  useEffect(() => {
+    if (!user) return
+    let cancelled = false
+    async function load() {
+      setLoading(true)
+      try {
+        const customer = await getCustomer()
+        if (!customer || cancelled) { setLoading(false); return }
+        const { data } = await getLeads(customer.id)
+        if (!cancelled) setLeads(data as LeadRecord[] || [])
+      } catch (err) {
+        console.error('Failed to load leads:', err)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [user])
+
+  const filtered = leads.filter(l => {
+    const st = l.status || 'cold'
+    if (filterStatus !== 'all' && st !== filterStatus) return false
     if (searchQuery) {
       const q = searchQuery.toLowerCase()
-      return l.name.toLowerCase().includes(q) || l.company.toLowerCase().includes(q) || l.industry.toLowerCase().includes(q)
+      return (
+        (l.name || '').toLowerCase().includes(q) ||
+        (l.company || '').toLowerCase().includes(q) ||
+        (l.industry || '').toLowerCase().includes(q)
+      )
     }
     return true
   })
@@ -36,7 +77,7 @@ export default function LeadsPage() {
   return (
     <div style={{ maxWidth: 900, fontFamily: fonts.body }}>
       <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, margin: '0 0 20px' }}>
-        Leads fanget og kvalifisert av AI — demo-data
+        Leads fanget og kvalifisert av AI
       </p>
 
       {/* Search + Filter */}
@@ -70,91 +111,133 @@ export default function LeadsPage() {
       </div>
 
       {/* Leads list */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {filtered.map(lead => {
-          const expanded = expandedId === lead.id
-          const st = statusConfig[lead.status]
-          return (
-            <div key={lead.id} style={{
+      {loading ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} style={{
               background: 'rgba(255,255,255,0.03)',
-              border: `1px solid ${expanded ? `rgba(${goldRgb},0.15)` : 'rgba(255,255,255,0.06)'}`,
-              borderRadius: 10, overflow: 'hidden',
+              border: '1px solid rgba(255,255,255,0.06)',
+              borderRadius: 10, padding: '14px 16px',
+              display: 'flex', alignItems: 'center', gap: 14,
             }}>
-              <button
-                onClick={() => setExpandedId(expanded ? null : lead.id)}
-                style={{
-                  width: '100%', padding: '14px 16px',
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', gap: 14,
-                  fontFamily: fonts.body, textAlign: 'left',
-                }}
-              >
-                <div style={{
-                  width: 36, height: 36, borderRadius: 8,
-                  background: `rgba(${goldRgb},0.08)`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0,
-                }}>
-                  <Building2 size={16} color={gold} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ color: '#f0f0f0', fontSize: 14, fontWeight: 500 }}>{lead.name}</div>
-                  <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>{lead.company} · {lead.industry}</div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <Star size={14} color="#facc15" fill="#facc15" />
-                    <span style={{ color: '#f0f0f0', fontSize: 13, fontWeight: 600 }}>{lead.score}</span>
-                  </div>
-                  <span style={{ padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600, background: st.bg, color: st.color }}>
-                    {st.label}
-                  </span>
-                  {expanded ? <ChevronUp size={16} color="rgba(255,255,255,0.3)" /> : <ChevronDown size={16} color="rgba(255,255,255,0.3)" />}
-                </div>
-              </button>
-
-              {expanded && (
-                <div style={{ padding: '0 16px 16px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-                  <div style={{ padding: '14px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <Phone size={14} color="rgba(255,255,255,0.3)" />
-                      <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>{lead.phone}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <Mail size={14} color="rgba(255,255,255,0.3)" />
-                      <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>{lead.email}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <MapPin size={14} color="rgba(255,255,255,0.3)" />
-                      <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>{lead.location}</span>
-                    </div>
-                    <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
-                      Kilde: {lead.source} · {lead.date}
-                    </div>
-                  </div>
-                  <div style={{
-                    background: 'rgba(255,255,255,0.02)', borderRadius: 8,
-                    padding: '12px 14px', marginTop: 4,
-                  }}>
-                    <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
-                      AI-notater
-                    </div>
-                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, lineHeight: 1.6, margin: 0 }}>
-                      {lead.notes}
-                    </p>
-                  </div>
-                </div>
-              )}
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.05)' }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ height: 14, width: '30%', background: 'rgba(255,255,255,0.06)', borderRadius: 4, marginBottom: 8 }} />
+                <div style={{ height: 11, width: '50%', background: 'rgba(255,255,255,0.04)', borderRadius: 4 }} />
+              </div>
+              <div style={{ height: 22, width: 50, background: 'rgba(255,255,255,0.05)', borderRadius: 12 }} />
             </div>
-          )
-        })}
+          ))}
+        </div>
+      ) : filtered.length === 0 && leads.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <div style={{ fontSize: 40, marginBottom: 16 }}>👥</div>
+          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 15, fontWeight: 500, margin: '0 0 8px' }}>
+            Ingen leads ennå
+          </p>
+          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 13, margin: 0 }}>
+            Leads vil vises her når AI-en fanger og kvalifiserer nye potensielle kunder.
+          </p>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {filtered.map(lead => {
+            const expanded = expandedId === lead.id
+            const st = statusConfig[lead.status || 'cold'] || statusConfig.cold
+            return (
+              <div key={lead.id} style={{
+                background: 'rgba(255,255,255,0.03)',
+                border: `1px solid ${expanded ? `rgba(${goldRgb},0.15)` : 'rgba(255,255,255,0.06)'}`,
+                borderRadius: 10, overflow: 'hidden',
+              }}>
+                <button
+                  onClick={() => setExpandedId(expanded ? null : lead.id)}
+                  style={{
+                    width: '100%', padding: '14px 16px',
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 14,
+                    fontFamily: fonts.body, textAlign: 'left',
+                  }}
+                >
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 8,
+                    background: `rgba(${goldRgb},0.08)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    <Building2 size={16} color={gold} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ color: '#f0f0f0', fontSize: 14, fontWeight: 500 }}>{lead.name || 'Ukjent'}</div>
+                    <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
+                      {[lead.company, lead.industry].filter(Boolean).join(' · ') || 'Ingen detaljer'}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+                    {lead.score != null && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Star size={14} color="#facc15" fill="#facc15" />
+                        <span style={{ color: '#f0f0f0', fontSize: 13, fontWeight: 600 }}>{lead.score}</span>
+                      </div>
+                    )}
+                    <span style={{ padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600, background: st.bg, color: st.color }}>
+                      {st.label}
+                    </span>
+                    {expanded ? <ChevronUp size={16} color="rgba(255,255,255,0.3)" /> : <ChevronDown size={16} color="rgba(255,255,255,0.3)" />}
+                  </div>
+                </button>
 
-        {filtered.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '40px 20px', color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>
-            Ingen leads funnet
-          </div>
-        )}
-      </div>
+                {expanded && (
+                  <div style={{ padding: '0 16px 16px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                    <div style={{ padding: '14px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                      {lead.phone && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <Phone size={14} color="rgba(255,255,255,0.3)" />
+                          <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>{lead.phone}</span>
+                        </div>
+                      )}
+                      {lead.email && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <Mail size={14} color="rgba(255,255,255,0.3)" />
+                          <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>{lead.email}</span>
+                        </div>
+                      )}
+                      {lead.location && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <MapPin size={14} color="rgba(255,255,255,0.3)" />
+                          <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>{lead.location}</span>
+                        </div>
+                      )}
+                      <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
+                        {lead.source ? `Kilde: ${lead.source} · ` : ''}{formatDate(lead.created_at)}
+                      </div>
+                    </div>
+                    {lead.notes && (
+                      <div style={{
+                        background: 'rgba(255,255,255,0.02)', borderRadius: 8,
+                        padding: '12px 14px', marginTop: 4,
+                      }}>
+                        <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                          AI-notater
+                        </div>
+                        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, lineHeight: 1.6, margin: 0 }}>
+                          {lead.notes}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+
+          {filtered.length === 0 && leads.length > 0 && (
+            <div style={{ textAlign: 'center', padding: '40px 20px', color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>
+              Ingen leads funnet for dette søket
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
