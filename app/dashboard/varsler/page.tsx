@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/lib/auth-context'
 
 interface Notification {
   id: string
@@ -16,8 +16,8 @@ interface Notification {
 }
 
 function VarslerContent() {
-  const searchParams = useSearchParams()
-  const email = searchParams.get('email') || ''
+  const { user } = useAuth()
+  const email = user?.email || ''
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -103,8 +103,8 @@ function VarslerContent() {
 
   if (!email) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p className="text-gray-400">Ingen e-post oppgitt. Legg til ?email=din@epost.no i URL-en.</p>
+      <div className="text-center py-16">
+        <p className="text-gray-400">Laster brukerdata...</p>
       </div>
     )
   }
@@ -205,13 +205,5 @@ function VarslerContent() {
 }
 
 export default function VarslerPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p className="text-gray-400">Laster varsler...</p>
-      </div>
-    }>
-      <VarslerContent />
-    </Suspense>
-  )
+  return <VarslerContent />
 }

@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { gold, goldRgb, bg, fonts } from '@/lib/constants'
+import { useAuth } from '@/lib/auth-context'
 import {
   LayoutDashboard, Phone, Users, CalendarCheck, Settings,
   Link2, Menu, X, ChevronRight, Zap, Package, Bell, Activity, HelpCircle
@@ -47,14 +48,14 @@ const sidebarSections = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, loading, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  useEffect(() => {
-    // Auth disabled for development — enable later
-    setLoading(false)
-  }, [])
+  // Redirect to login if not authenticated
+  if (!loading && !user) {
+    router.replace('/login')
+    return null
+  }
 
   const isActive = (href: string) => {
     if (href === '/dashboard') return pathname === '/dashboard'
@@ -169,14 +170,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div style={{
           padding: '16px 14px',
           borderTop: '1px solid rgba(255,255,255,0.06)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
           <div style={{
             fontSize: 12, color: 'rgba(255,255,255,0.35)',
             overflow: 'hidden', textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            whiteSpace: 'nowrap', flex: 1, minWidth: 0,
           }}>
-            {user?.email || 'Demo-modus'}
+            {user?.email || ''}
           </div>
+          <button
+            onClick={() => signOut()}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              fontSize: 11, color: 'rgba(255,255,255,0.25)',
+              padding: '2px 6px', flexShrink: 0,
+            }}
+            title="Logg ut"
+          >
+            Logg ut
+          </button>
         </div>
       </aside>
 
