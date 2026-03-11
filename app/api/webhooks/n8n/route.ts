@@ -99,8 +99,6 @@ export async function POST(req: NextRequest) {
             metadata: { automation_key, error_message },
             created_at: new Date().toISOString(),
           })
-          .then(() => {})
-          .catch(err => console.error('Failed to log ai_activity:', err))
 
         break
       }
