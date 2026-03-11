@@ -7,7 +7,7 @@ function verifySecret(req: NextRequest): boolean {
 }
 
 /**
- * POST /api/webhooks/n8n
+ * POST /api/webhooks/n8
  * General n8n callback endpoint for workflow status updates.
  * n8n calls this to report progress on automation setup, deployment, etc.
  *
@@ -84,7 +84,6 @@ export async function POST(req: NextRequest) {
           .from('customer_automations')
           .update({
             status: 'error',
-            config: supabaseAdmin.rpc ? undefined : undefined, // keep existing config
             updated_at: new Date().toISOString(),
           })
           .eq('customer_id', customer_id)
