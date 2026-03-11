@@ -110,6 +110,36 @@ export async function getAutomations(customerId: string) {
   return { data: data || [], error }
 }
 
+// ---- Customer Automations (Phase 1) ----
+export async function getCustomerAutomations(customerId: string) {
+  const { data, error } = await supabase
+    .from('customer_automations')
+    .select('*')
+    .eq('customer_id', customerId)
+    .order('created_at', { ascending: true })
+
+  return { data: data || [], error }
+}
+
+export async function getOnboardingSteps(customerId: string) {
+  const { data, error } = await supabase
+    .from('onboarding_tracking')
+    .select('*')
+    .eq('customer_id', customerId)
+    .order('created_at', { ascending: true })
+
+  return { data: data || [], error }
+}
+
+export async function submitIntakeForm(answers: Record<string, any>, integrations?: string[], notes?: string) {
+  const res = await fetch('/api/onboarding/intake', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ answers, integrations, notes }),
+  })
+  return res.json()
+}
+
 // ---- Recent Activity (combines calls, leads, bookings) ----
 export async function getRecentActivity(customerId: string, limit = 10) {
   const [callsRes, leadsRes, bookingsRes] = await Promise.all([
