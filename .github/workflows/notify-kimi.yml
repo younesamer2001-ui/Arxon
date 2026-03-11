@@ -1,0 +1,31 @@
+name: Notify on Deploy
+
+on:
+  push:
+    branches: [main]
+  deployment_status:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Telegram on deploy
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          STATUS="${{ github.event.deployment_status.state || 'pushed' }}"
+          URL="${{ github.event.deployment_status.environment_url || 'pending' }}"
+          COMMIT="${{ github.sha }}"
+          SHORT_SHA="${COMMIT:0:7}"
+          MSG="${{ github.event.head_commit.message || 'deployment event' }}"
+
+          curl -s -X POST \
+            "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
+            -d parse_mode="Markdown" \
+            -d text="🚀 *Arxon Deploy*
+          Status: \`${STATUS}\`
+          Commit: \`${SHORT_SHA}\`
+          Message: ${MSG}
+          URL: ${URL}"
