@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/lib/auth-context'
+import { getCustomer, updateCustomer } from '@/lib/dashboard'
 import { gold, goldRgb, fonts } from '@/lib/constants'
-import { User, Building2, Phone, Mail, Globe, Bell, Shield, Save, Check } from 'lucide-react'
+import { Building2, Mail, Bell, Save, Check, Loader2 } from 'lucide-react'
 
 interface SettingsForm {
   companyName: string
@@ -18,7 +19,10 @@ interface SettingsForm {
 }
 
 export default function SettingsPage() {
-  const [user, setUser] = useState<any>(null)
+  const { user } = useAuth()
+  const [customerId, setCustomerId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [form, setForm] = useState<SettingsForm>({
     companyName: '',
@@ -33,25 +37,58 @@ export default function SettingsPage() {
   })
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
-        setUser(session.user)
-        // In production, load from Supabase customer profile table
+    if (!user) return
+    let cancelled = false
+    async function load() {
+      setLoading(true)
+      try {
+        const customer = await getCustomer()
+        if (!customer || cancelled) { setLoading(false); return }
+        setCustomerId(customer.id)
         setForm(prev => ({
           ...prev,
-          companyName: 'Din Bedrift AS',
-          contactName: session.user.email?.split('@')[0] || '',
+          companyName: customer.company_name || '',
+          contactName: customer.contact_name || '',
+          phone: customer.phone || '',
+          website: customer.website || '',
+          notifyEmail: customer.notify_email ?? true,
+          notifySms: customer.notify_sms ?? false,
+          notifyNewLead: customer.notify_new_lead ?? true,
+          notifyMissedCall: customer.notify_missed_call ?? true,
+          notifyBooking: customer.notify_booking ?? true,
         }))
+      } catch (err) {
+        console.error('Failed to load settings:', err)
+      } finally {
+        if (!cancelled) setLoading(false)
       }
     }
-    getUser()
-  }, [])
+    load()
+    return () => { cancelled = true }
+  }, [user])
 
-  const handleSave = () => {
-    // In production: save to Supabase
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+  const handleSave = async () => {
+    if (!customerId) return
+    setSaving(true)
+    try {
+      await updateCustomer(customerId, {
+        company_name: form.companyName,
+        contact_name: form.contactName,
+        phone: form.phone,
+        website: form.website,
+        notify_email: form.notifyEmail,
+        notify_sms: form.notifySms,
+        notify_new_lead: form.notifyNewLead,
+        notify_missed_call: form.notifyMissedCall,
+        notify_booking: form.notifyBooking,
+      })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch (err) {
+      console.error('Failed to save settings:', err)
+    } finally {
+      setSaving(false)
+    }
   }
 
   const inputStyle: React.CSSProperties = {
@@ -65,6 +102,27 @@ export default function SettingsPage() {
   const labelStyle: React.CSSProperties = {
     color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: 500,
     display: 'block', marginBottom: 6,
+  }
+
+  if (loading) {
+    return (
+      <div style={{ maxWidth: 640, fontFamily: fonts.body }}>
+        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, margin: '0 0 24px' }}>
+          Administrer bedriftsprofil og varslingsinnstillinger
+        </p>
+        {[1, 2, 3].map(i => (
+          <div key={i} style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.06)',
+            borderRadius: 12, padding: '24px', marginBottom: 16,
+          }}>
+            <div style={{ height: 18, width: '30%', background: 'rgba(255,255,255,0.06)', borderRadius: 4, marginBottom: 20 }} />
+            <div style={{ height: 40, width: '100%', background: 'rgba(255,255,255,0.04)', borderRadius: 8, marginBottom: 12 }} />
+            <div style={{ height: 40, width: '100%', background: 'rgba(255,255,255,0.04)', borderRadius: 8 }} />
+          </div>
+        ))}
+      </div>
+    )
   }
 
   return (
@@ -187,17 +245,19 @@ export default function SettingsPage() {
       </section>
 
       {/* Save button */}
-      <button onClick={handleSave} style={{
+      <button onClick={handleSave} disabled={saving || !customerId} style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
         width: '100%', padding: '14px',
         borderRadius: 10, border: 'none',
         background: saved ? '#4ade80' : `linear-gradient(135deg, ${gold}, #d4a85a)`,
         color: saved ? '#fff' : '#0f1b27',
         fontWeight: 700, fontSize: 15,
-        cursor: 'pointer', fontFamily: fonts.body,
+        cursor: saving || !customerId ? 'not-allowed' : 'pointer',
+        opacity: saving || !customerId ? 0.6 : 1,
+        fontFamily: fonts.body,
         transition: 'all 0.2s',
       }}>
-        {saved ? <><Check size={18} /> Lagret!</> : <><Save size={16} /> Lagre endringer</>}
+        {saved ? <><Check size={18} /> Lagret!</> : saving ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Lagrer...</> : <><Save size={16} /> Lagre endringer</>}
       </button>
     </div>
   )
