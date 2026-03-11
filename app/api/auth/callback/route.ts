@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -12,9 +12,23 @@ export async function GET(request: NextRequest) {
   }
 
   if (code) {
-    const supabase = createClient(
+    const response = NextResponse.redirect(new URL('/dashboard', request.url))
+
+    const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options as any)
+            })
+          },
+        },
+      }
     )
 
     const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
@@ -22,8 +36,11 @@ export async function GET(request: NextRequest) {
     if (exchangeError) {
       return NextResponse.redirect(new URL('/login?error=exchange_failed', request.url))
     }
+
+    // Return the response with cookies set
+    return response
   }
 
-  // Successful auth — go to dashboard
+  // No code — redirect to dashboard
   return NextResponse.redirect(new URL('/dashboard', request.url))
 }
