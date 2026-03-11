@@ -8,7 +8,7 @@ import { gold, goldRgb, bg, fonts } from '@/lib/constants'
 import { useAuth } from '@/lib/auth-context'
 import {
   LayoutDashboard, Phone, Users, CalendarCheck, Settings,
-  Link2, Menu, X, ChevronRight, Zap, Package, Bell, Activity, HelpCircle
+  Link2, Menu, X, ChevronRight, Zap, Package, Bell, Activity, HelpCircle, Shield
 } from 'lucide-react'
 
 const sidebarSections = [
@@ -41,6 +41,7 @@ const sidebarSections = [
       { href: '/dashboard/varsler', label: 'Varsler', icon: Bell },
       { href: '/dashboard/support', label: 'Support', icon: HelpCircle },
       { href: '/dashboard/innstillinger', label: 'Innstillinger', icon: Settings },
+      { href: '/dashboard/admin', label: 'Admin', icon: Shield },
     ]
   },
 ]
