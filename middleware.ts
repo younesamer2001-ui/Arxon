@@ -1,3 +1,4 @@
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 
 // Simple in-memory rate limiter (IP -> timestamps)
@@ -45,7 +46,7 @@ function isRateLimited(ip: string): boolean {
   return false
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // ── API routes: rate limiting + CORS ──
@@ -82,17 +83,50 @@ export function middleware(request: NextRequest) {
     return response
   }
 
-  // ── Protected routes: redirect to login if no Supabase session cookie ──
+  // ── Create response for potential cookie updates ──
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  // ── Protected routes: use Supabase SSR to check session ──
   const protectedPaths = ['/dashboard']
   const isProtected = protectedPaths.some(p => pathname.startsWith(p))
 
   if (isProtected) {
-    // Supabase stores session in cookies; check for the auth token cookie
-    const hasSession =
-      request.cookies.get('sb-aqqwailbeotauehyrwpy-auth-token') ||
-      request.cookies.get('sb-aqqwailbeotauehyrwpy-auth-token.0')
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
+            // Update request cookies for downstream handlers
+            cookiesToSet.forEach(({ name, value }) => {
+              request.cookies.set(name, value)
+            })
+            // Create new response with updated request
+            response = NextResponse.next({
+              request: {
+                headers: request.headers,
+              },
+            })
+            // Set cookies on the response
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options as any)
+            })
+          },
+        },
+      }
+    )
 
-    if (!hasSession) {
+    // This will refresh the session if needed and update cookies
+    const { data: { user }, error } = await supabase.auth.getUser()
+
+    if (error || !user) {
       const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('redirect', pathname)
       return NextResponse.redirect(loginUrl)
@@ -100,15 +134,12 @@ export function middleware(request: NextRequest) {
   }
 
   // ── Page routes: geo detection via Vercel headers ──
-  const response = NextResponse.next()
-
   // Vercel automatically injects these headers on their edge network
   const city = request.headers.get('x-vercel-ip-city')
   const country = request.headers.get('x-vercel-ip-country')
   const region = request.headers.get('x-vercel-ip-country-region')
 
   // Set lightweight cookies so client components can read geo data
-  // Only set if we have data and the cookie isn't already set (avoid re-setting on every request)
   if (city) {
     response.cookies.set('arxon-geo-city', decodeURIComponent(city), {
       path: '/',
