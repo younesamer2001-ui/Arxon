@@ -30,3 +30,23 @@ export async function getSession() {
   const { data: { session }, error } = await supabase.auth.getSession()
   return { session, error }
 }
+
+export async function signInWithGoogle() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/api/auth/callback`,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  })
+  return { data, error }
+}
+
+export function onAuthStateChange(callback: (session: any) => void) {
+  return supabase.auth.onAuthStateChange((_event, session) => {
+    callback(session)
+  })
+}

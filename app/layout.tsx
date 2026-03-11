@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import dynamic from 'next/dynamic'
 import { LanguageProvider } from '@/lib/language-context'
 import { GeoProvider } from '@/lib/geo-context'
+import { AuthProvider } from '@/lib/auth-context'
 import './globals.css'
 
 const inter = Inter({
@@ -201,13 +202,15 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen antialiased" style={{ backgroundColor: '#050510', color: '#f4f1eb' }}>
         <a href="#main-content" className="skip-to-content">Hopp til hovedinnhold</a>
-        <LanguageProvider>
-          <GeoProvider>
-            <main id="main-content">
-              {children}
-            </main>
-          </GeoProvider>
-        </LanguageProvider>
+        <AuthProvider>
+          <LanguageProvider>
+            <GeoProvider>
+              <main id="main-content">
+                {children}
+              </main>
+            </GeoProvider>
+          </LanguageProvider>
+        </AuthProvider>
         <ChatWidget />
         <CookieConsent />
       </body>

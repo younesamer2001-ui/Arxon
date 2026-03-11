@@ -82,6 +82,23 @@ export function middleware(request: NextRequest) {
     return response
   }
 
+  // ── Protected routes: redirect to login if no Supabase session cookie ──
+  const protectedPaths = ['/dashboard']
+  const isProtected = protectedPaths.some(p => pathname.startsWith(p))
+
+  if (isProtected) {
+    // Supabase stores session in cookies; check for the auth token cookie
+    const hasSession =
+      request.cookies.get('sb-aqqwailbeotauehyrwpy-auth-token') ||
+      request.cookies.get('sb-aqqwailbeotauehyrwpy-auth-token.0')
+
+    if (!hasSession) {
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+  }
+
   // ── Page routes: geo detection via Vercel headers ──
   const response = NextResponse.next()
 
