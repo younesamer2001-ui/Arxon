@@ -310,7 +310,7 @@ export async function POST(req: NextRequest) {
             const n8nBaseUrl = process.env.N8N_BASE_URL
             const webhookSecret = process.env.WEBHOOK_SECRET
             if (n8nBaseUrl && customerId) {
-              fetch(`${n8nBaseUrl}/webhook/purchase-completed`, {
+              fetch(`${n8nBaseUrl}/webhook/arxon-purchase-completed`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
