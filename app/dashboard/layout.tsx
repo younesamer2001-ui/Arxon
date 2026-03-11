@@ -11,46 +11,56 @@ import {
   Link2, Menu, X, ChevronRight, Zap, Package, Bell, Activity, HelpCircle, Shield
 } from 'lucide-react'
 
-const sidebarSections = [
-  {
-    label: null,
-    links: [
-      { href: '/dashboard', label: 'Oversikt', icon: LayoutDashboard },
-      { href: '/dashboard/besparelser', label: 'Aktivitet', icon: Activity },
-    ]
-  },
-  {
-    label: 'Aktivitet',
-    links: [
-      { href: '/dashboard/anrop', label: 'Anrop', icon: Phone },
-      { href: '/dashboard/leads', label: 'Leads', icon: Users },
-      { href: '/dashboard/bookinger', label: 'Bookinger', icon: CalendarCheck },
-    ]
-  },
-  {
-    label: 'System',
-    links: [
-      { href: '/dashboard/automatiseringer', label: 'Automatiseringer', icon: Zap },
-      { href: '/dashboard/integrasjoner', label: 'Integrasjoner', icon: Link2 },
-      { href: '/dashboard/onboarding', label: 'Oppsett', icon: Package },
-    ]
-  },
-  {
-    label: 'Konto',
-    links: [
-      { href: '/dashboard/varsler', label: 'Varsler', icon: Bell },
-      { href: '/dashboard/support', label: 'Support', icon: HelpCircle },
-      { href: '/dashboard/innstillinger', label: 'Innstillinger', icon: Settings },
-      { href: '/dashboard/admin', label: 'Admin', icon: Shield },
-    ]
-  },
-]
+const ADMIN_EMAILS = ['kontakt@arxon.no']
+
+function getSidebarSections(userEmail: string | undefined) {
+  const kontoLinks = [
+    { href: '/dashboard/varsler', label: 'Varsler', icon: Bell },
+    { href: '/dashboard/support', label: 'Support', icon: HelpCircle },
+    { href: '/dashboard/innstillinger', label: 'Innstillinger', icon: Settings },
+  ]
+
+  if (userEmail && ADMIN_EMAILS.includes(userEmail)) {
+    kontoLinks.push({ href: '/dashboard/admin', label: 'Admin', icon: Shield })
+  }
+
+  return [
+    {
+      label: null,
+      links: [
+        { href: '/dashboard', label: 'Oversikt', icon: LayoutDashboard },
+        { href: '/dashboard/besparelser', label: 'Aktivitet', icon: Activity },
+      ]
+    },
+    {
+      label: 'Aktivitet',
+      links: [
+        { href: '/dashboard/anrop', label: 'Anrop', icon: Phone },
+        { href: '/dashboard/leads', label: 'Leads', icon: Users },
+        { href: '/dashboard/bookinger', label: 'Bookinger', icon: CalendarCheck },
+      ]
+    },
+    {
+      label: 'System',
+      links: [
+        { href: '/dashboard/automatiseringer', label: 'Automatiseringer', icon: Zap },
+        { href: '/dashboard/integrasjoner', label: 'Integrasjoner', icon: Link2 },
+        { href: '/dashboard/onboarding', label: 'Oppsett', icon: Package },
+      ]
+    },
+    {
+      label: 'Konto',
+      links: kontoLinks,
+    },
+  ]
+}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const { user, loading, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const sidebarSections = getSidebarSections(user?.email ?? undefined)
 
   // Redirect to login if not authenticated
   if (!loading && !user) {
