@@ -35,11 +35,13 @@ export async function getSession() {
 
 // ==================== OAUTH PROVIDERS ====================
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(redirectTo?: string) {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/api/auth/callback`,
+      redirectTo: redirectTo 
+        ? `${typeof window !== 'undefined' ? window.location.origin : ''}${redirectTo}`
+        : `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
       queryParams: {
         access_type: 'offline',
         prompt: 'consent',
@@ -50,11 +52,13 @@ export async function signInWithGoogle() {
 }
 
 // NEW: Microsoft OAuth
-export async function signInWithMicrosoft() {
+export async function signInWithMicrosoft(redirectTo?: string) {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'azure',
     options: {
-      redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/api/auth/callback/microsoft`,
+      redirectTo: redirectTo
+        ? `${typeof window !== 'undefined' ? window.location.origin : ''}${redirectTo}`
+        : `${typeof window !== 'undefined' ? window.location.origin : ''}/api/auth/callback/microsoft`,
       scopes: 'email profile openid User.Read',
     },
   })
@@ -75,9 +79,9 @@ export async function sendMagicLink(email: string) {
 }
 
 // NEW: Verify magic link token
-export async function signInWithMagicToken(token_hash: string) {
+export async function signInWithMagicToken(token: string) {
   const { data, error } = await supabase.auth.verifyOtp({
-    token_hash,
+    token_hash: token,
     type: 'magiclink',
   })
   return { data, error }
