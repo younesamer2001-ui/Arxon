@@ -49,6 +49,63 @@ const automationToIntegrations: Record<string, string[]> = {
   'anmeldelseshÃ¥ndtering': ['tripadvisor', 'google_business', 'booking_com'],
 }
 
+/* ------------------------------------------------------------------ */
+/*  Auto-create a customer record so the dashboard works immediately  */
+/* ------------------------------------------------------------------ */
+async function autoCreateCustomer(
+  email: string,
+  name: string,
+  phone: string,
+  orderId: string,
+) {
+  try {
+    // Check if customer already exists (by email)
+    const { data: existing } = await supabaseAdmin
+      .from('customers')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle()
+
+    if (existing) {
+      console.log(`Customer already exists for ${email}`)
+      return existing.id
+    }
+
+    // Fetch order to get company name & automations
+    const { data: order } = await supabaseAdmin
+      .from('orders')
+      .select('company_name, industry, automations')
+      .eq('id', orderId)
+      .single()
+
+    const { data: customer, error } = await supabaseAdmin
+      .from('customers')
+      .insert({
+        email,
+        contact_person: name || null,
+        company_name: order?.company_name || name || email,
+        phone: phone || null,
+        onboarding_status: 'pending',
+        industry: order?.industry || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single()
+
+    if (error) {
+      console.error('Failed to auto-create customer:', error)
+      return null
+    }
+
+    console.log(`Auto-created customer ${customer.id} for ${email}`)
+    return customer.id
+  } catch (err) {
+    console.error('autoCreateCustomer error:', err)
+    return null
+  }
+}
+
 async function initializeWorkflows(orderId: string, customerEmail: string) {
   try {
     // Fetch order to get automations
@@ -171,6 +228,16 @@ export async function POST(req: NextRequest) {
           // Auto-initialize workflows for this order
           if (customerEmail) {
             await initializeWorkflows(orderId, customerEmail)
+          }
+
+          // Auto-create customer record so dashboard works immediately
+          if (customerEmail) {
+            await autoCreateCustomer(
+              customerEmail,
+              session.customer_details?.name || '',
+              session.customer_details?.phone || '',
+              orderId,
+            )
           }
         }
         break
