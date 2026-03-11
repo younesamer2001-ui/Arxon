@@ -8,47 +8,87 @@ const supabase = createClient(
 
 export async function GET() {
   try {
-    // Fetch all counts in parallel
-    const [customersRes, callsRes, leadsRes, bookingsRes, workflowsRes] = await Promise.all([
+    // Hent alle stats på én gang
+    const [
+      customersRes,
+      ordersRes,
+      workflowsRes,
+      onboardingRes,
+      activitiesRes
+    ] = await Promise.all([
+      // Totalt antall kunder
       supabase.from('customers').select('id', { count: 'exact', head: true }),
-      supabase.from('calls').select('id', { count: 'exact', head: true }),
-      supabase.from('leads').select('id', { count: 'exact', head: true }),
-      supabase.from('bookings').select('id', { count: 'exact', head: true }),
-      supabase.from('customer_workflows').select('id', { count: 'exact', head: true }),
+      
+      // Ordrer og omsetning
+      supabase.from('orders').select('setup_total, monthly_total, status'),
+      
+      // Workflows status
+      supabase.from('customer_workflows').select('workflow_status, health_status'),
+      
+      // Onboarding status
+      supabase.from('onboarding_tracking').select('step_key, status'),
+      
+      // AI Activities (samtaler)
+      supabase.from('ai_activities').select('duration_seconds, cost_saved')
     ])
 
-    // Per-customer activity counts
-    const [callsByCustomer, leadsByCustomer, bookingsByCustomer, workflowsByCustomer] = await Promise.all([
-      supabase.from('calls').select('customer_id'),
-      supabase.from('leads').select('customer_id'),
-      supabase.from('bookings').select('customer_id'),
-      supabase.from('customer_workflows').select('customer_id'),
-    ])
-
-    const countByCustomer = (rows: any[] | null) => {
-      const map: Record<string, number> = {}
-      for (const r of rows || []) {
-        map[r.customer_id] = (map[r.customer_id] || 0) + 1
-      }
-      return map
-    }
+    // Kalkuler omsetning
+    const totalRevenue = ordersRes.data?.reduce((sum, o) => sum + (o.setup_total || 0), 0) || 0
+    const monthlyRecurring = ordersRes.data?.reduce((sum, o) => sum + (o.monthly_total || 0), 0) || 0
+    
+    // Tell workflow status
+    const activeWorkflows = workflowsRes.data?.filter(w => w.workflow_status === 'active').length || 0
+    const failedWorkflows = workflowsRes.data?.filter(w => w.health_status === 'error').length || 0
+    
+    // Onboarding pipeline
+    const onboardingPending = onboardingRes.data?.filter(o => o.status === 'pending').length || 0
+    const onboardingInProgress = onboardingRes.data?.filter(o => o.status === 'in_progress').length || 0
+    const onboardingCompleted = onboardingRes.data?.filter(o => o.status === 'completed').length || 0
+    
+    // Samtale stats
+    const totalCalls = activitiesRes.data?.length || 0
+    const totalDuration = activitiesRes.data?.reduce((sum, a) => sum + (a.duration_seconds || 0), 0) || 0
+    const avgDuration = totalCalls > 0 ? Math.round(totalDuration / totalCalls) : 0
+    const totalSaved = activitiesRes.data?.reduce((sum, a) => sum + (a.cost_saved || 0), 0) || 0
 
     return NextResponse.json({
-      global: {
+      success: true,
+      stats: {
+        // Kunder
         total_customers: customersRes.count || 0,
-        total_calls: callsRes.count || 0,
-        total_leads: leadsRes.count || 0,
-        total_bookings: bookingsRes.count || 0,
-        total_workflows: workflowsRes.count || 0,
-      },
-      per_customer: {
-        calls: countByCustomer(callsByCustomer.data),
-        leads: countByCustomer(leadsByCustomer.data),
-        bookings: countByCustomer(bookingsByCustomer.data),
-        workflows: countByCustomer(workflowsByCustomer.data),
+        
+        // Økonomi (i NOK)
+        total_revenue_nok: Math.round(totalRevenue / 100),
+        monthly_recurring_nok: Math.round(monthlyRecurring / 100),
+        total_cost_saved_nok: Math.round(totalSaved),
+        
+        // Workflows
+        total_workflows: workflowsRes.data?.length || 0,
+        active_workflows: activeWorkflows,
+        failed_workflows: failedWorkflows,
+        
+        // Onboarding
+        onboarding_pending: onboardingPending,
+        onboarding_in_progress: onboardingInProgress,
+        onboarding_completed: onboardingCompleted,
+        
+        // Samtaler
+        total_calls: totalCalls,
+        total_duration_seconds: totalDuration,
+        avg_call_duration_seconds: avgDuration,
+        
+        // Ordrer
+        total_orders: ordersRes.data?.length || 0,
+        pending_orders: ordersRes.data?.filter(o => o.status === 'pending').length || 0,
+        active_orders: ordersRes.data?.filter(o => o.status === 'active').length || 0,
       }
     })
   } catch (err) {
-    return NextResponse.json({ error: 'Intern serverfeil' }, { status: 500 })
+    console.error('Stats API error:', err)
+    return NextResponse.json({ 
+      success: false,
+      error: 'Intern serverfeil',
+      details: err instanceof Error ? err.message : 'Unknown error'
+    }, { status: 500 })
   }
 }
