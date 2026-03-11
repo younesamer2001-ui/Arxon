@@ -51,26 +51,16 @@ const automationToIntegrations: Record<string, string[]> = {
 
 /* ------------------------------------------------------------------ */
 /*  Auto-create a customer record so the dashboard works immediately  */
+/*  Also creates customer_automations + onboarding_tracking records   */
 /* ------------------------------------------------------------------ */
 async function autoCreateCustomer(
   email: string,
   name: string,
   phone: string,
   orderId: string,
+  stripeCustomerId: string,
 ) {
   try {
-    // Check if customer already exists (by email)
-    const { data: existing } = await supabaseAdmin
-      .from('customers')
-      .select('id')
-      .eq('email', email)
-      .maybeSingle()
-
-    if (existing) {
-      console.log(`Customer already exists for ${email}`)
-      return existing.id
-    }
-
     // Fetch order to get company name & automations
     const { data: order } = await supabaseAdmin
       .from('orders')
@@ -78,28 +68,104 @@ async function autoCreateCustomer(
       .eq('id', orderId)
       .single()
 
-    const { data: customer, error } = await supabaseAdmin
+    // Check if customer already exists (by email)
+    const { data: existing } = await supabaseAdmin
       .from('customers')
-      .insert({
-        email,
-        contact_person: name || null,
-        company_name: order?.company_name || name || email,
-        phone: phone || null,
-        onboarding_status: 'pending',
-        industry: order?.industry || null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
       .select('id')
-      .single()
+      .eq('email', email)
+      .maybeSingle()
 
-    if (error) {
-      console.error('Failed to auto-create customer:', error)
-      return null
+    let customerId: string
+
+    if (existing) {
+      customerId = existing.id
+      // Update existing customer with Stripe + order info
+      await supabaseAdmin
+        .from('customers')
+        .update({
+          stripe_customer_id: stripeCustomerId,
+          order_id: orderId,
+          contact_name: name || undefined,
+          contact_person: name || undefined,
+          onboarding_status: 'pending',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', customerId)
+      console.log(`Updated existing customer ${customerId} for ${email}`)
+    } else {
+      // Create new customer record
+      const { data: customer, error } = await supabaseAdmin
+        .from('customers')
+        .insert({
+          email,
+          contact_name: name || null,
+          contact_person: name || null,
+          company_name: order?.company_name || name || email,
+          phone: phone || null,
+          stripe_customer_id: stripeCustomerId,
+          order_id: orderId,
+          onboarding_status: 'pending',
+          industry: order?.industry || null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .select('id')
+        .single()
+
+      if (error) {
+        console.error('Failed to auto-create customer:', error)
+        return null
+      }
+      customerId = customer.id
+      console.log(`Auto-created customer ${customerId} for ${email}`)
     }
 
-    console.log(`Auto-created customer ${customer.id} for ${email}`)
-    return customer.id
+    // Create customer_automations records from the order
+    const automations = (order?.automations as Array<{ key: string; name: string }>) || []
+    for (const automation of automations) {
+      await supabaseAdmin
+        .from('customer_automations')
+        .upsert({
+          customer_id: customerId,
+          order_id: orderId,
+          automation_key: automation.key,
+          automation_name: automation.name,
+          status: 'purchased',
+          config: {},
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'customer_id,automation_key' })
+    }
+    console.log(`Created ${automations.length} customer_automations for ${customerId}`)
+
+    // Create onboarding_tracking steps
+    const onboardingSteps = [
+      { step_key: 'payment', step_name: 'Betaling' },
+      { step_key: 'intake_form', step_name: 'Kartleggingsskjema' },
+      { step_key: 'integration_setup', step_name: 'Integrasjonsoppsett' },
+      { step_key: 'workflow_deploy', step_name: 'Arbeidsflyt-deploy' },
+      { step_key: 'testing', step_name: 'Testing' },
+      { step_key: 'go_live', step_name: 'Go Live' },
+    ]
+
+    for (const step of onboardingSteps) {
+      await supabaseAdmin
+        .from('onboarding_tracking')
+        .upsert({
+          customer_id: customerId,
+          order_id: orderId,
+          step_key: step.step_key,
+          step_name: step.step_name,
+          status: step.step_key === 'payment' ? 'completed' : 'pending',
+          started_at: step.step_key === 'payment' ? new Date().toISOString() : null,
+          completed_at: step.step_key === 'payment' ? new Date().toISOString() : null,
+          metadata: {},
+          created_at: new Date().toISOString(),
+        }, { onConflict: 'customer_id,step_key' })
+    }
+    console.log(`Created ${onboardingSteps.length} onboarding steps for ${customerId}`)
+
+    return customerId
   } catch (err) {
     console.error('autoCreateCustomer error:', err)
     return null
@@ -230,14 +296,41 @@ export async function POST(req: NextRequest) {
             await initializeWorkflows(orderId, customerEmail)
           }
 
-          // Auto-create customer record so dashboard works immediately
+          // Auto-create customer record + automations + onboarding steps
           if (customerEmail) {
-            await autoCreateCustomer(
+            const customerId = await autoCreateCustomer(
               customerEmail,
               session.customer_details?.name || '',
               session.customer_details?.phone || '',
               orderId,
+              (session.customer as string) || '',
             )
+
+            // Notify n8n that a new purchase was completed (fire-and-forget)
+            const n8nBaseUrl = process.env.N8N_BASE_URL
+            const webhookSecret = process.env.WEBHOOK_SECRET
+            if (n8nBaseUrl && customerId) {
+              fetch(`${n8nBaseUrl}/webhook/purchase-completed`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-webhook-secret': webhookSecret || '',
+                },
+                body: JSON.stringify({
+                  customer_id: customerId,
+                  order_id: orderId,
+                  email: customerEmail,
+                  name: session.customer_details?.name || '',
+                  stripe_customer_id: (session.customer as string) || '',
+                  automations: (await supabaseAdmin
+                    .from('orders')
+                    .select('automations')
+                    .eq('id', orderId)
+                    .single()
+                  ).data?.automations || [],
+                }),
+              }).catch(err => console.error('n8n purchase webhook error:', err))
+            }
           }
         }
         break
