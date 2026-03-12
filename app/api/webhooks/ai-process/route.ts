@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { summarizeCall, analyzeSentiment, qualifyLead, extractContactInfo } from '@/lib/openai'
 
+export const dynamic = 'force-dynamic'
+
 function verifySecret(req: NextRequest): boolean {
   const secret = req.headers.get('x-webhook-secret') || req.headers.get('authorization')?.replace('Bearer ', '')
   return secret === process.env.WEBHOOK_SECRET

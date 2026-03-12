@@ -3,6 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase-server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * POST /api/onboarding/intake
  * Submits the customer's intake/kartlegging form.
