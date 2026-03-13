@@ -27,7 +27,7 @@ const tierIcons: Record<TierKey, any> = {
   premium: Shield,
 }
 
-export default function TierCheckoutPage() {
+function CheckoutContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { lang } = useLanguage()
@@ -316,5 +316,13 @@ export default function TierCheckoutPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function TierCheckoutPage() {
+  return (
+    <Suspense fallback={<div style={{ background: bgDark, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: gold }}>Laster...</div>}>
+      <CheckoutContent />
+    </Suspense>
   )
 }

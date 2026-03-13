@@ -1,14 +1,12 @@
-import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@/lib/supabase-server'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+
 
 export async function GET() {
+  const supabase = createServerClient();
   try {
     const { data: workflows, error } = await supabase
       .from('customer_workflows')
@@ -26,6 +24,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const supabase = createServerClient();
   try {
     const body = await req.json()
     const { customer_id, workflow_name, automation_key, workflow_status, n8n_workflow_id, n8n_workflow_url } = body
@@ -59,6 +58,7 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
+  const supabase = createServerClient();
   try {
     const body = await req.json()
     const { id, ...updates } = body
@@ -104,6 +104,7 @@ export async function PATCH(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const supabase = createServerClient();
   try {
     const { searchParams } = new URL(req.url)
     const id = searchParams.get('id')

@@ -1,3 +1,4 @@
+import { createServerClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase-server'
@@ -230,6 +231,7 @@ async function initializeWorkflows(orderId: string, customerEmail: string) {
 }
 
 export async function POST(req: NextRequest) {
+  const supabase = createServerClient();
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
   if (!webhookSecret) {
     console.error('STRIPE_WEBHOOK_SECRET is not set')

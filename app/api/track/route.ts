@@ -1,18 +1,16 @@
-import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@/lib/supabase-server'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+
 
 /**
  * Track auth events for analytics
  * POST /api/track
  */
 export async function POST(request: Request) {
+  const supabase = createServerClient();
   try {
     const body = await request.json()
     const { event, email, metadata = {} } = body

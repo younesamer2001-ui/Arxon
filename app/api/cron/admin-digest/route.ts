@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@/lib/supabase-server'
 import { adminDigestEmail } from '@/lib/email-templates'
 
 export const dynamic = 'force-dynamic'
@@ -20,13 +20,6 @@ interface Lead {
   created_at: string
   ref_number?: string
   all_answers?: Record<string, any>
-}
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
 }
 
 async function sendEmail(to: string, subject: string, html: string): Promise<{ success: boolean; error?: string }> {
@@ -61,6 +54,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<{ s
 }
 
 export async function GET(request: NextRequest) {
+  const supabase = createServerClient();
   // Security check
   const authHeader = request.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -68,7 +62,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = getSupabaseAdmin()
     const adminEmail = process.env.ADMIN_EMAIL
 
     if (!adminEmail) {

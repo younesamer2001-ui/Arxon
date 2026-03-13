@@ -1,3 +1,4 @@
+import { createServerClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
@@ -8,6 +9,7 @@ const anthropic = new Anthropic({
 })
 
 export async function POST(request: NextRequest) {
+  const supabase = createServerClient();
   try {
     const body = await request.json()
     const { session, previousAnswers, action, language } = body

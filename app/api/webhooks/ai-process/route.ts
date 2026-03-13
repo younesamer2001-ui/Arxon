@@ -1,3 +1,4 @@
+import { createServerClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
 import { summarizeCall, analyzeSentiment, qualifyLead, extractContactInfo } from '@/lib/openai'
 
@@ -20,6 +21,7 @@ function verifySecret(req: NextRequest): boolean {
  * }
  */
 export async function POST(req: NextRequest) {
+  const supabase = createServerClient();
   if (!verifySecret(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }

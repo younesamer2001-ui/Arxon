@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@/lib/supabase-server'
 
 export const dynamic = 'force-dynamic'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+
 
 // GET - Fetch notifications for a customer
 export async function GET(request: NextRequest) {
+  const supabase = createServerClient();
   try {
     const { searchParams } = new URL(request.url)
     const email = searchParams.get('email')
@@ -56,6 +54,7 @@ export async function GET(request: NextRequest) {
 
 // POST - Create a new notification
 export async function POST(request: NextRequest) {
+  const supabase = createServerClient();
   try {
     const body = await request.json()
     const { order_id, customer_email, type, title, message, metadata } = body
@@ -94,6 +93,7 @@ export async function POST(request: NextRequest) {
 
 // PATCH - Mark notification(s) as read
 export async function PATCH(request: NextRequest) {
+  const supabase = createServerClient();
   try {
     const body = await request.json()
     const { notification_id, mark_all_read, customer_email } = body

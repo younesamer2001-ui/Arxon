@@ -1,12 +1,9 @@
 export const dynamic = 'force-dynamic'
   
-import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@/lib/supabase-server'
 import { NextResponse } from 'next/server'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+
 
 const N8N_BASE_URL = process.env.N8N_BASE_URL || 'https://saiai.app.n8n.cloud'
 const N8N_API_KEY = process.env.N8N_API_KEY || ''
@@ -47,6 +44,7 @@ async function getN8nExecutions(workflowId: string, limit = 5) {
 }
 
 export async function GET(req: Request) {
+  const supabase = createServerClient();
   try {
     const { searchParams } = new URL(req.url)
     const orderId = searchParams.get('order_id')

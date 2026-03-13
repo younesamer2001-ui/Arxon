@@ -1,15 +1,13 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@/lib/supabase-server'
 
 export const dynamic = 'force-dynamic'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 export async function GET() {
+  const supabase = createServerClient();
   try {
+    
+
     // Get the most recent order (will be replaced with auth-based lookup later)
     const { data: order, error } = await supabase
       .from('orders')

@@ -13,12 +13,19 @@ export async function GET(req: NextRequest) {
   try {
     // Get authenticated user
     const cookieStore = cookies()
-    const supabase = createServerClient(
+    const supabaseClient = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: { get: (name: string) => cookieStore.get(name)?.value } }
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll() {}
+        }
+      }
     )
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: 'Ikke autentisert' }, { status: 401 })
     }

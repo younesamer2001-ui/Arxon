@@ -1,18 +1,16 @@
-import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@/lib/supabase-server'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+
 
 /**
  * Send magic link for passwordless login
  * POST /api/auth/magic-link
  */
 export async function POST(request: Request) {
+  const supabase = createServerClient();
   try {
     const { email, redirectTo = '/dashboard' } = await request.json()
 

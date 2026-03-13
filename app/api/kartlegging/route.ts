@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@/lib/supabase-server'
 
 export const dynamic = 'force-dynamic'
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
 
 // Simple email validation
 function isValidEmail(email: string): boolean {
@@ -17,6 +10,7 @@ function isValidEmail(email: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
+  const supabase = createServerClient();
   try {
     const body = await request.json()
     const { action } = body
@@ -65,7 +59,7 @@ export async function POST(request: NextRequest) {
       const refNumber = 'YAI-' + Math.random().toString(36).substr(2, 8).toUpperCase()
 
       // Save to Supabase
-      const { error: dbError } = await getSupabaseAdmin().from('leads').insert({
+      const { error: dbError } = await supabase.from('leads').insert({
         company_name: contact.company,
         contact_name: contact.name,
         email: contact.email,
