@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+import Link from 'next/link'
 import Nav from '@/app/components/Nav'
 import Footer from '@/app/components/Footer'
 import { goldRgb } from '@/lib/constants'
@@ -59,7 +60,9 @@ export default function Home() {
             initial={{ y: 80 }} animate={{ y: 0 }} exit={{ y: 80 }}
             className="fixed bottom-0 left-0 right-0 z-50 p-3 md:hidden"
             style={{ background: `rgba(5,5,16,0.92)`, borderTop: `1px solid rgba(${goldRgb},0.15)`, backdropFilter: 'blur(12px)' }}>
-            <a href="#trust-bar" className="gold-btn w-full rounded-lg py-3 text-[14px] font-bold text-center block">Start kartlegging</a>
+            <Link href="/kartlegging" className="gold-btn w-full rounded-lg py-3 text-[14px] font-bold text-center block" style={{ textDecoration: 'none' }}>
+              Start kartlegging
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
@@ -216,7 +219,31 @@ export default function Home() {
         }
 
         .gold-btn-pulse {
-          animation: pulse-glow 2s ease-in-out infinite;
+          animation: pulse-glow 2.5s ease-in-out infinite;
+        }
+
+        .cta-shimmer {
+          position: relative;
+          overflow: hidden;
+          background: linear-gradient(135deg, #efc07b 0%, #ffd699 100%);
+        }
+
+        .cta-shimmer::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 50%;
+          height: 100%;
+          background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4), transparent);
+          transform: skewX(-20deg);
+          animation: shimmerSweep 4s infinite 2s;
+        }
+
+        @keyframes shimmerSweep {
+          0% { left: -100%; }
+          20% { left: 200%; }
+          100% { left: 200%; }
         }
 
         /* ── Divider ── */

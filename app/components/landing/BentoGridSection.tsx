@@ -6,6 +6,8 @@ import { Bot, CalendarCheck, Users, BarChart3, Cog, Megaphone, ArrowUpRight } fr
 import { gold, goldRgb } from '@/lib/constants'
 import { useLanguage } from '@/lib/language-context'
 
+import { SpotlightCard } from '@/app/components/ui/SpotlightCard'
+
 const sAnim = {
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
@@ -52,19 +54,22 @@ export function BentoGridSection() {
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.35, delay: i * 0.06 }}
-              whileHover={{ y: -3, borderColor: `rgba(${goldRgb},0.3)`, transition: { duration: 0.2 } }}
-              className="flex items-center gap-3 px-4 py-3.5 md:px-5 md:py-4 rounded-xl cursor-default"
-              style={{
-                background: 'rgba(13, 26, 45, 0.35)',
-                border: `1px solid rgba(${goldRgb},0.1)`,
-                backdropFilter: 'blur(8px)',
-              }}
+              whileHover={{ y: -3, transition: { duration: 0.2 } }}
             >
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{ background: `rgba(${goldRgb},0.1)`, border: `1px solid rgba(${goldRgb},0.15)` }}>
-                <span style={{ color: gold }}>{item.icon}</span>
-              </div>
-              <span className="text-[13px] md:text-[14px] font-semibold" style={{ color: '#f4f1eb' }}>{item.title}</span>
+              <SpotlightCard
+                className="flex items-center gap-3 px-4 py-3.5 md:px-5 md:py-4 rounded-xl cursor-default h-full"
+                style={{
+                  background: 'rgba(13, 26, 45, 0.35)',
+                  border: `1px solid rgba(${goldRgb},0.1)`,
+                  backdropFilter: 'blur(8px)',
+                }}
+              >
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 relative z-10"
+                  style={{ background: `rgba(${goldRgb},0.1)`, border: `1px solid rgba(${goldRgb},0.15)` }}>
+                  <span style={{ color: gold }}>{item.icon}</span>
+                </div>
+                <span className="text-[13px] md:text-[14px] font-semibold relative z-10" style={{ color: '#f4f1eb' }}>{item.title}</span>
+              </SpotlightCard>
             </motion.div>
           ))}
         </div>

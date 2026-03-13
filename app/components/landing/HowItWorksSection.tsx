@@ -19,6 +19,8 @@ function trackEvent(eventName: string, params?: Record<string, string | number>)
   }
 }
 
+import { SpotlightCard } from '@/app/components/ui/SpotlightCard'
+
 const sAnim = {
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
@@ -63,6 +65,7 @@ export function HowItWorksSection() {
               whileInView={{ opacity: 1, x: 0, scale: 1 }}
               viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.2 }}
               className="relative pl-16 md:pl-20 pb-12 last:pb-0"
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
             >
               <motion.div
                 initial={{ scale: 0 }}
@@ -74,8 +77,8 @@ export function HowItWorksSection() {
                 <span className="text-sm font-bold" style={{ color: gold }}>{item.step}</span>
               </motion.div>
 
-              <div className="glass-card p-6 hover-lift">
-                <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+              <SpotlightCard className="glass-card p-6" style={{ cursor: 'default' }}>
+                <div className="flex items-center justify-between mb-3 flex-wrap gap-2 relative z-10">
                   <h3 className="text-[16px] font-bold flex items-center gap-2" style={{ color: '#f4f1eb' }}>
                     <span style={{ color: gold }}>{item.icon}</span> {item.title}
                   </h3>
@@ -84,8 +87,8 @@ export function HowItWorksSection() {
                     {item.time}
                   </span>
                 </div>
-                <p className="text-[14px] leading-relaxed" style={{ color: 'rgba(244,241,235,0.65)' }}>{item.desc}</p>
-              </div>
+                <p className="text-[14px] leading-relaxed relative z-10" style={{ color: 'rgba(244,241,235,0.65)' }}>{item.desc}</p>
+              </SpotlightCard>
             </motion.div>
           ))}
         </div>
