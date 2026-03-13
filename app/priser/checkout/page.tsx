@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 import Nav from '@/app/components/Nav'
 import Footer from '@/app/components/Footer'
-import { PRICING, TIER_PACKAGES, TierKey, formatKr } from '@/lib/pricing'
+import { PRICING, TIER_PACKAGES, TierKey, formatKr, pricingAutomations, PricingAutomation } from '@/lib/pricing'
 import { useLanguage } from '@/lib/language-context'
 import { useCalBooking } from '@/lib/useCalBooking'
 
@@ -36,6 +36,7 @@ function CheckoutContent() {
 
   const tierKey = (searchParams.get('tier') || '') as TierKey
   const initialBilling = (searchParams.get('billing') as BillingMode) || 'annual'
+  const industryParam = searchParams.get('industry') || 'Generell'
   const [billing, setBilling] = useState<BillingMode>(initialBilling)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
 
@@ -67,33 +68,75 @@ function CheckoutContent() {
   }
 
   const tier = PRICING.tiers[pkg.pricingTier]
+  
+  // Find predefined automations matching the tier size and requested industry
+  let filteredAutomations: PricingAutomation[] = []
+  if (industryParam !== 'Generell') {
+     const byIndustry = pricingAutomations.filter(a => a.industry === industryParam)
+     // Allocate count based on tier
+     const limit = tierKey === 'basis' ? 1 : tierKey === 'pro' ? 3 : 5
+     filteredAutomations = byIndustry.slice(0, limit)
+  }
+
+  // Calculate pricing from actual automations, simulating package builder cost
+  const platformFee = 600 // same logic as pakkebygger
+  const authSetups = filteredAutomations.reduce((acc, curr) => acc + curr.setupPrice, 0)
+  const authMonthlys = filteredAutomations.reduce((acc, curr) => acc + curr.monthlyPrice, 0)
+  
+  // Apply standard discount bracket based on number of automations
+  let bulkDiscount = 0
+  for (const d of PRICING.discount) {
+    if (filteredAutomations.length >= d.min && filteredAutomations.length <= d.max) {
+      bulkDiscount = d.rate
+      break
+    }
+  }
+
+  const baseSetup = authSetups
+  const baseMonthly = Math.round(authMonthlys * (1 - bulkDiscount)) + platformFee
+
   const monthlyPrice = billing === 'annual'
-    ? Math.round(tier.monthly * (1 - PRICING.annualDiscount))
-    : tier.monthly
+    ? Math.round(baseMonthly * (1 - PRICING.annualDiscount))
+    : baseMonthly
   const annualTotal = monthlyPrice * 12
-  const annualSavings = Math.round(tier.monthly * 12 * PRICING.annualDiscount)
+  const annualSavings = Math.round(baseMonthly * 12 * PRICING.annualDiscount)
+
   const TierIcon = tierIcons[tierKey]
   const features = no ? pkg.features.no : pkg.features.en
+
+  // Override feature list with actual included automations if we have them
+  const displayFeatures = filteredAutomations.length > 0 
+    ? filteredAutomations.map(a => a.name) 
+    : features
 
   const handleCheckout = useCallback(async () => {
     setCheckoutLoading(true)
     try {
+      // Build the automation array for Stripe API route
+      const checkoutAutomations = filteredAutomations.length > 0 ? filteredAutomations.map(a => ({
+          name: a.name,
+          setupPrice: a.setupPrice,
+          monthlyPrice: a.monthlyPrice,
+          complexity: a.complexity,
+          industry: a.industry,
+      })) : [{
+          name: `${no ? pkg.name.no : pkg.name.en} — ${pkg.automationCount} ${no ? 'automasjon(er)' : 'automation(s)'}`,
+          setupPrice: baseSetup,
+          monthlyPrice: baseMonthly,
+          complexity: pkg.pricingTier,
+          industry: industryParam,
+      }]
+
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          automations: [{
-            name: `${no ? pkg.name.no : pkg.name.en} — ${pkg.automationCount} ${no ? 'automasjon(er)' : 'automation(s)'}`,
-            setupPrice: tier.setup,
-            monthlyPrice: monthlyPrice,
-            complexity: pkg.pricingTier,
-            industry: 'Generell',
-          }],
+          automations: checkoutAutomations,
           billingMode: billing,
-          setupTotal: tier.setup,
-          monthlyTotal: monthlyPrice,
-          discountRate: 0,
-          industry: 'Generell',
+          setupTotal: baseSetup,
+          monthlyTotal: baseMonthly,
+          discountRate: bulkDiscount,
+          industry: industryParam,
           cancelUrl: `${window.location.origin}/priser`,
         }),
       })
@@ -109,7 +152,7 @@ function CheckoutContent() {
       alert(no ? 'Kunne ikke starte betaling.' : 'Could not start payment.')
       setCheckoutLoading(false)
     }
-  }, [billing, monthlyPrice, tier, pkg, no])
+  }, [billing, baseSetup, baseMonthly, bulkDiscount, industryParam, filteredAutomations, pkg, no])
 
   return (
     <div style={{ background: bgDark, minHeight: '100vh', color: '#f4f1eb' }}>
@@ -153,7 +196,9 @@ function CheckoutContent() {
                   {no ? pkg.name.no : pkg.name.en}
                 </h1>
                 <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', margin: '4px 0 0' }}>
-                  {no ? pkg.desc.no : pkg.desc.en}
+                  {industryParam !== 'Generell' 
+                     ? `${no ? 'Skreddersydd for:' : 'Tailored for:'} ${industryParam}` 
+                     : no ? pkg.desc.no : pkg.desc.en}
                 </p>
               </div>
             </div>
@@ -223,16 +268,18 @@ function CheckoutContent() {
                 {no ? 'Engangskostnad oppsett' : 'One-time setup fee'}
               </span>
               <span style={{ fontSize: 16, fontWeight: 600, color: '#f4f1eb' }}>
-                {formatKr(tier.setup)}
+                {formatKr(baseSetup)}
               </span>
             </div>
 
             {/* Features */}
             <div style={{ marginBottom: 32 }}>
               <h3 style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 16 }}>
-                {no ? 'Inkludert i pakken:' : 'Included in package:'}
+                {filteredAutomations.length > 0 
+                  ? (no ? 'Følgende automasjoner klargjøres:' : 'The following automations are prepared:') 
+                  : (no ? 'Inkludert i pakken:' : 'Included in package:')}
               </h3>
-              {features.map((feature, idx) => (
+              {displayFeatures.map((feature, idx) => (
                 <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 14 }}>
                   <Check size={16} color={gold} style={{ flexShrink: 0, marginTop: 2 }} />
                   <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', lineHeight: 1.4 }}>{feature}</span>

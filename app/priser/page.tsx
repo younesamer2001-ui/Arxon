@@ -6,7 +6,8 @@ import { motion } from 'framer-motion'
 import { Check, Sparkles, Zap, Shield, ArrowRight, Bot, Phone, CalendarDays, BarChart3, Clock } from 'lucide-react'
 import Nav from '@/app/components/Nav'
 import Footer from '@/app/components/Footer'
-import { PRICING, formatKr } from '@/lib/pricing'
+import { useRouter } from 'next/navigation'
+import { PRICING, formatKr, pricingIndustries } from '@/lib/pricing'
 import { useLanguage } from '@/lib/language-context'
 import { useCalBooking } from '@/lib/useCalBooking'
 
@@ -18,15 +19,34 @@ const cardBg = 'rgba(255,255,255,0.03)'
 type BillingMode = 'monthly' | 'annual'
 
 export default function PriserPage() {
+  const router = useRouter()
   const { lang } = useLanguage()
   const no = lang === 'no'
   const [billing, setBilling] = useState<BillingMode>('annual')
+  const [selectedTier, setSelectedTier] = useState<string | null>(null)
   const openBooking = useCalBooking()
 
   const calculatePrice = (monthlyBase: number) => {
     return billing === 'annual'
       ? Math.round(monthlyBase * (1 - PRICING.annualDiscount))
       : monthlyBase
+  }
+
+  const handleTierClick = (e: React.MouseEvent, tierHref: string, isCustom?: boolean) => {
+    e.preventDefault()
+    if (isCustom) {
+      router.push(tierHref)
+      return
+    }
+    const tierMatch = tierHref.match(/tier=([^&]+)/)
+    if (tierMatch) {
+      setSelectedTier(tierMatch[1])
+    }
+  }
+
+  const handleIndustrySelect = (industry: string) => {
+    if (!selectedTier) return
+    router.push(`/priser/checkout?tier=${selectedTier}&industry=${encodeURIComponent(industry)}`)
   }
 
   const tiers = [
@@ -212,17 +232,32 @@ export default function PriserPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + (i * 0.1) }}
+              whileHover={{ 
+                scale: tier.highlighted ? 1.03 : 1.02, 
+                boxShadow: tier.highlighted ? `0 20px 40px rgba(${goldRgb},0.2)` : `0 20px 40px rgba(0,0,0,0.4)`,
+                y: -5 
+              }}
               style={{
                 position: 'relative',
                 background: tier.highlighted ? `rgba(${goldRgb},0.08)` : cardBg,
-                border: `1px solid ${tier.highlighted ? `rgba(${goldRgb},0.4)` : 'rgba(255,255,255,0.08)'}`,
+                border: `1px solid ${tier.highlighted ? `rgba(${goldRgb},0.5)` : 'rgba(255,255,255,0.08)'}`,
+                boxShadow: tier.highlighted ? `0 0 40px rgba(${goldRgb}, 0.1)` : 'none',
                 borderRadius: 20,
                 padding: '32px 24px',
                 display: 'flex', flexDirection: 'column',
                 transform: tier.highlighted ? 'scale(1.02)' : 'none',
                 zIndex: tier.highlighted ? 10 : 1,
+                overflow: 'hidden',
+                backdropFilter: 'blur(12px)',
               }}
             >
+              {tier.highlighted && (
+                <div style={{
+                  position: 'absolute', top: 0, left: 0, right: 0, height: 150,
+                  background: `radial-gradient(circle at top, rgba(${goldRgb},0.2), transparent 70%)`,
+                  pointerEvents: 'none'
+                }} />
+              )}
               {tier.badge && (
                 <div style={{
                   position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
@@ -288,13 +323,13 @@ export default function PriserPage() {
 
               <div style={{ marginTop: 'auto' }}>
                 {tier.isCustom ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      <Link href={tier.href} style={{
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, position: 'relative' }}>
+                      <Link href={tier.href} onClick={(e) => handleTierClick(e, tier.href, true)} style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                         width: '100%', padding: '14px', borderRadius: 12,
                         background: `rgba(${goldRgb},0.15)`, color: gold,
                         fontWeight: 600, textDecoration: 'none', border: `1px solid rgba(${goldRgb},0.3)`,
-                        transition: 'all 0.2s'
+                        transition: 'all 0.2s', boxShadow: `0 0 20px rgba(${goldRgb},0.1)`
                       }}>
                         {tier.cta} <ArrowRight size={16} />
                       </Link>
@@ -305,6 +340,8 @@ export default function PriserPage() {
                         fontWeight: 500, border: '1px solid rgba(255,255,255,0.2)',
                         transition: 'all 0.2s', cursor: 'pointer'
                       }}
+                      onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                      onMouseOut={e => e.currentTarget.style.background = 'transparent'}
                       data-cal-namespace="gratis-ai-konsultasjon"
                       data-cal-link="arxon/gratis-ai-konsultasjon"
                       data-cal-config='{"layout":"month_view"}'>
@@ -312,13 +349,14 @@ export default function PriserPage() {
                       </button>
                     </div>
                 ) : (
-                  <Link href={tier.href} style={{
+                  <Link href={tier.href} onClick={(e) => handleTierClick(e, tier.href, false)} style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                    width: '100%', padding: '16px', borderRadius: 12,
+                    width: '100%', padding: '16px', borderRadius: 12, position: 'relative',
                     background: tier.highlighted ? gold : 'rgba(255,255,255,0.06)',
                     color: tier.highlighted ? bgDark : '#fff',
                     fontWeight: 600, textDecoration: 'none', transition: 'all 0.2s',
-                    border: tier.highlighted ? 'none' : '1px solid rgba(255,255,255,0.1)'
+                    border: tier.highlighted ? 'none' : '1px solid rgba(255,255,255,0.1)',
+                    boxShadow: tier.highlighted ? `0 0 20px rgba(${goldRgb}, 0.4)` : 'none',
                   }}>
                     {tier.cta} <ArrowRight size={16} />
                   </Link>
@@ -367,6 +405,85 @@ export default function PriserPage() {
 
          </div>
       </section>
+
+      {/* Industry Modal */}
+      {selectedTier && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100,
+          background: 'rgba(5, 5, 16, 0.8)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24
+        }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setSelectedTier(null)
+        }}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            style={{
+              background: '#0a0a1a', border: `1px solid rgba(${goldRgb},0.2)`,
+              borderRadius: 24, padding: '40px 32px', width: '100%', maxWidth: 500,
+              boxShadow: `0 24px 80px rgba(0,0,0,0.6), 0 0 40px rgba(${goldRgb},0.05)`,
+              position: 'relative'
+            }}
+          >
+            <button
+               onClick={() => setSelectedTier(null)}
+               style={{
+                 position: 'absolute', top: 20, right: 20, background: 'transparent',
+                 border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer',
+                 padding: 8, display: 'flex', fontSize: 13,
+               }}
+            >
+              Opphev
+            </button>
+            
+            <div style={{ textAlign: 'center', marginBottom: 32 }}>
+              <div style={{
+                width: 48, height: 48, borderRadius: 16, background: `rgba(${goldRgb},0.1)`,
+                color: gold, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto 16px'
+              }}>
+                <Bot size={24} />
+              </div>
+              <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>
+                {no ? 'Velg din bransje' : 'Select your industry'}
+              </h2>
+              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 15, lineHeight: 1.5 }}>
+                {no 
+                  ? 'Vi skreddersyr automasjonene i denne pakken spesifikt for ditt fagområde før vi går videre.' 
+                  : 'We tailor the automations in this package specifically for your field before proceeding.'}
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {pricingIndustries.map(industry => (
+                <button
+                  key={industry}
+                  onClick={() => handleIndustrySelect(industry)}
+                  style={{
+                    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+                    padding: '16px 20px', borderRadius: 12, color: '#fff', fontSize: 16,
+                    fontWeight: 500, textAlign: 'left', cursor: 'pointer',
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    transition: 'all 0.2s', outline: 'none'
+                  }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.background = `rgba(${goldRgb},0.08)`
+                    e.currentTarget.style.borderColor = `rgba(${goldRgb},0.3)`
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+                  }}
+                >
+                  {industry}
+                  <ArrowRight size={18} color={gold} />
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       <Footer />
     </div>
