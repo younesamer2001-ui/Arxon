@@ -61,21 +61,19 @@ export async function POST(req: NextRequest) {
         .join(', ')
 
       const isAnnual = billingMode === 'annual'
-      const effectiveMonthly = isAnnual
-        ? Math.round(monthlyTotal * 0.8) // 20% annual discount
-        : monthlyTotal
 
       lineItems.push({
         price_data: {
           currency: 'nok',
           product_data: {
-            name: `Arxon AI — ${automations.length} automatisering${automations.length > 1 ? 'er' : ''}`,
+            name: `Arxon AI — ${automations.length} automatisering${automations.length > 1 ? 'er' : ''}`,
             description: monthlyDescription,
           },
-          unit_amount: Math.round(effectiveMonthly * 100), // Convert to øre
+          unit_amount: isAnnual
+            ? Math.round(monthlyTotal * 12 * 100)
+            : Math.round(monthlyTotal * 100),
           recurring: {
             interval: isAnnual ? 'year' : 'month',
-            ...(isAnnual ? {} : {}),
           },
         },
         quantity: 1,
