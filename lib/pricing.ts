@@ -26,6 +26,87 @@ export const PRICING = {
   },
 } as const
 
+export type TierKey = 'basis' | 'pro' | 'premium'
+
+export interface TierPackage {
+  key: TierKey
+  name: { no: string; en: string }
+  desc: { no: string; en: string }
+  pricingTier: keyof typeof PRICING.tiers
+  automationCount: string
+  features: { no: string[]; en: string[] }
+}
+
+export const TIER_PACKAGES: Record<TierKey, TierPackage> = {
+  basis: {
+    key: 'basis',
+    name: { no: 'Basis', en: 'Basic' },
+    desc: { no: 'Kom i gang med AI-automatisering', en: 'Get started with AI automation' },
+    pricingTier: 'Lav',
+    automationCount: '1',
+    features: {
+      no: [
+        'Én enkel AI-automasjon',
+        'Standard maler og oppsett',
+        'E-post support',
+        'Ukentlig datarapport',
+      ],
+      en: [
+        'One simple AI automation',
+        'Standard templates and setup',
+        'Email support',
+        'Weekly data report',
+      ],
+    },
+  },
+  pro: {
+    key: 'pro',
+    name: { no: 'Pro', en: 'Pro' },
+    desc: { no: 'Mest populær for voksende bedrifter', en: 'Most popular for growing businesses' },
+    pricingTier: 'Middels',
+    automationCount: '1–3',
+    features: {
+      no: [
+        'Inntil 3 AI-automasjoner',
+        'Avansert system-integrasjon (CRM/Booking)',
+        'Skreddersydd AI-trening',
+        'Prioritert support via telefon',
+        'Månedlig optimalisering',
+      ],
+      en: [
+        'Up to 3 AI automations',
+        'Advanced system integration (CRM/Booking)',
+        'Custom AI training',
+        'Priority phone support',
+        'Monthly optimization',
+      ],
+    },
+  },
+  premium: {
+    key: 'premium',
+    name: { no: 'Premium', en: 'Premium' },
+    desc: { no: 'Maksimal effekt for etablerte aktører', en: 'Maximum impact for established players' },
+    pricingTier: 'Høy',
+    automationCount: '5+',
+    features: {
+      no: [
+        'Komplett AI-system (5+ automasjoner)',
+        'Dype fagsystem-integrasjoner',
+        'Proaktiv overvåking og skalering',
+        'Dedikert kontaktperson',
+        'Kvartalsvise strategimøter',
+      ],
+      en: [
+        'Complete AI system (5+ automations)',
+        'Deep industry system integrations',
+        'Proactive monitoring and scaling',
+        'Dedicated account manager',
+        'Quarterly strategy meetings',
+      ],
+    },
+  },
+}
+
 export function getDiscountRate(count: number): number {
   for (const tier of PRICING.discount) {
     if (count >= tier.min && count <= tier.max) return tier.rate

@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
       mode: 'subscription', // subscription mode handles both one-time and recurring
       line_items: lineItems,
       success_url: `${appUrl}/bestilling/bekreftelse?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/pakkebygger?cancelled=true`,
+      cancel_url: body.cancelUrl || `${appUrl}/pakkebygger?cancelled=true`,
       locale: 'nb' as any, // Norwegian
       payment_method_types: ['card'],
       billing_address_collection: 'required',
