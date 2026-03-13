@@ -10,16 +10,35 @@ export function TechLogos() {
     { name: 'Vercel', svg: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M12 1L24 22H0L12 1z"/></svg> },
   ]
 
+  // Double the array to allow for seamless infinite scrolling
+  const marqueeLogos = [...logos, ...logos]
+
   return (
-    <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
-      {logos.map((logo) => (
-        <div key={logo.name} className="group flex flex-col items-center gap-2 cursor-default">
-          <div className="transition-all duration-300 group-hover:scale-110" style={{ color: 'rgba(244,241,235,0.4)' }}>
-            {logo.svg}
+    <div className="relative w-full overflow-hidden py-4" style={{ 
+      maskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
+      WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)'
+    }}>
+      <div className="flex w-max animate-marquee gap-12 md:gap-16 items-center">
+        {marqueeLogos.map((logo, i) => (
+          <div key={`${logo.name}-${i}`} className="group flex flex-col items-center gap-2 cursor-default flex-shrink-0">
+            <div className="transition-all duration-300 group-hover:scale-110" style={{ color: 'rgba(244,241,235,0.4)', width: 28, height: 28 }}>
+              {logo.svg}
+            </div>
           </div>
-          <span className="text-[10px] tracking-widest uppercase transition-colors" style={{ color: 'rgba(244,241,235,0.55)' }}>{logo.name}</span>
-        </div>
-      ))}
+        ))}
+      </div>
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(calc(-50% - 1.5rem)); /* Offset by half the total width plus gap */ }
+        }
+        .animate-marquee {
+          animation: marquee 25s linear infinite;
+        }
+        .animate-marquee:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
     </div>
   )
 }
