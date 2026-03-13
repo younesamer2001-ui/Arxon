@@ -12,7 +12,7 @@ export const tierColors = {
 
 export const fonts = {
   body: "'Inter', system-ui, -apple-system, sans-serif",
-  heading: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
+  heading: "'Inter', system-ui, -apple-system, sans-serif",
 }
 
 export const BOOKING_URL = 'https://calendar.google.com/calendar/appointments/schedules/' // TODO: Replace with actual Google Calendar booking link when ENK is registered
@@ -29,7 +29,7 @@ export const fadeUp = {
 }
 
 export const globalStyles = (extraCss = '') => `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
   ::selection { background: rgba(${goldRgb},0.3); }
   .cta-shimmer { background: linear-gradient(110deg, ${gold} 0%, #e0c88a 25%, ${gold} 50%, #a8884d 75%, ${gold} 100%); background-size: 200% 100%; animation: shimmer 3s linear infinite; }
   .cta-shimmer:hover { transform: translateY(-1px); box-shadow: 0 12px 40px rgba(${goldRgb},0.35) !important; }
